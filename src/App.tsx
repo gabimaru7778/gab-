@@ -29,7 +29,7 @@ export default function App() {
   const [networkResult, setNetworkResult] = useState<NetworkResult | null>(null);
   const [networkBusy, setNetworkBusy] = useState(false);
   const [devicePlan, setDevicePlan] = useState<string>("Aún no se ha analizado este dispositivo.");
-  const deviceCapabilities = useMemo(() => detectDeviceCapabilities({ userAgent: navigator.userAgent, online: navigator.onLine, canShare: typeof navigator.share === "function", canUseBluetooth: "bluetooth" in navigator, canUseCamera: !!navigator.mediaDevices?.getUserMedia }), []);
+  const deviceCapabilities = useMemo(() => detectDeviceCapabilities({ userAgent: navigator.userAgent, online: navigator.onLine, canShare: typeof navigator.share === "function", canUseBluetooth: "bluetooth" in navigator, canUseCamera: !!navigator.mediaDevices?.getUserMedia }), [online]);
   const [jsonText, setJsonText] = useState('{\n  "name": "LOW",\n  "version": "0.1.0",\n  "active": true\n}');
   const [requiredFields, setRequiredFields] = useState("name, version");
   const [csvText, setCsvText] = useState("id,name,status\n1,LOW,active\n2,Agent,planned");
