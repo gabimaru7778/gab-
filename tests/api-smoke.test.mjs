@@ -23,7 +23,7 @@ test('registration creates a session and isolates vault records',async()=>{
  const cookie=(r.headers.get('set-cookie')||'').split(';')[0];assert.match(cookie,/^low_session=/);
  const me=await fetch(base+'/api/auth/me',{headers:{cookie}});assert.equal((await me.json()).user.email,email);
  const vault=await fetch(base+'/api/vault',{headers:{cookie}});assert.equal(vault.status,200);assert.deepEqual((await vault.json()).records,[]);
- const save=await fetch(base+'/api/vault',{method:'POST',headers:{cookie,'content-type':'application/json'},body:JSON.stringify({title:'test',salt:'salt',iv:'iv',ciphertext:'ciphertext'})});
+ const save=await fetch(base+'/api/vault',{method:'POST',headers:{cookie,'content-type':'application/json'},body:JSON.stringify({title:'test',salt:'AAAAAAAAAAAAAAAAAAAAAA==',iv:'AAAAAAAAAAAAAAAA',ciphertext:'Y2lwaGVydGV4dA=='})});
  assert.equal(save.status,201);
  const saved=await save.json();assert.ok(saved.record?.id);assert.equal(saved.record.title,'test');
  const listed=await fetch(base+'/api/vault',{headers:{cookie}});const records=(await listed.json()).records;
@@ -44,4 +44,6 @@ test('API keys authenticate, expose models and can be revoked',async()=>{
  const revoked=await fetch(base+'/api/keys/'+keyId,{method:'DELETE',headers:{cookie}});assert.equal(revoked.status,200);
  const after=await fetch(base+'/v1/models',{headers:{authorization:'Bearer '+value}});assert.equal(after.status,401);
 });
+test('research reports a clear configuration error without a provider key',async()=>{const r=await fetch(base+'/api/guest/research',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({query:'OWASP Top 10'})});assert.equal(r.status,503);assert.match((await r.json()).error,/TAVILY_API_KEY/);});
+test('vault rejects malformed encryption metadata',async()=>{const login=await fetch(base+'/api/auth/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:'bad-vault-'+Date.now()+'@example.test',name:'Vault Test',password:'this is a long test password'})});const cookie=(login.headers.get('set-cookie')||'').split(';')[0];const bad=await fetch(base+'/api/vault',{method:'POST',headers:{cookie,'content-type':'application/json'},body:JSON.stringify({title:'bad',salt:'bad',iv:'bad',ciphertext:'bad'})});assert.equal(bad.status,400);});
 test('private vault rejects anonymous requests',async()=>{const r=await fetch(base+'/api/vault');assert.equal(r.status,401);});
