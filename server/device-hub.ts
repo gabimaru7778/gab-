@@ -79,6 +79,7 @@ deviceHub.post("/heartbeat", (req, res) => {
   if (battery !== undefined && battery !== null && (!Number.isInteger(battery) || battery < 0 || battery > 100)) return res.status(400).json({ error: "Batería inválida" });
   if (appState !== undefined && !["foreground", "background", "idle"].includes(appState)) return res.status(400).json({ error: "Estado de aplicación inválido" });
   if (network !== undefined && !["online", "offline"].includes(network)) return res.status(400).json({ error: "Estado de red inválido" });
+  res.setHeader("Cache-Control", "no-store");
   device.telemetry = { batteryPercent: battery ?? device.telemetry.batteryPercent, appState: appState ?? device.telemetry.appState, network: network ?? device.telemetry.network, lastSeen: Date.now() };
   return res.json({ ok: true, receivedAt: new Date(device.telemetry.lastSeen).toISOString() });
 });
@@ -86,6 +87,7 @@ deviceHub.post("/heartbeat", (req, res) => {
 deviceHub.get("/", (req, res) => {
   const device = getDevice(req);
   if (!device) return res.status(401).json({ error: "Dispositivo no autorizado" });
+  res.setHeader("Cache-Control", "no-store");
   const linked = [...devices.values()].filter((d) => d.linkId === device.linkId && d.id !== device.id && !d.revoked);
   return res.json({ devices: linked.map((d) => ({ id: d.id, name: d.name, telemetry: d.telemetry, online: Date.now() - d.telemetry.lastSeen < 90_000 })) });
 });
@@ -96,5 +98,6 @@ deviceHub.delete("/:deviceId", (req, res) => {
   const target = devices.get(req.params.deviceId);
   if (!target || target.linkId !== device.linkId) return res.status(404).json({ error: "Dispositivo no encontrado en este vínculo" });
   for (const d of devices.values()) if (d.linkId === device.linkId) d.revoked = true;
+  res.setHeader("Cache-Control", "no-store");
   return res.json({ ok: true, revoked: true, message: "Vínculo revocado para ambos dispositivos" });
 });
