@@ -44,3 +44,19 @@
 
 ## Current known baseline
 The recovered AppDeploy snapshot is version `1794036989678`. It contains a React/TypeScript UI, a TypeScript backend, a calculator tool, a client-side encrypted vault flow, an initial agent endpoint, Higgsfield media integration and a passive authorized security-review route. These are baseline observations, not a claim that every external provider or workflow is fully operational.
+
+
+## GitHub-native progress (2026-11-16)
+- [x] Create `low-github-native` integration branch from `main`.
+- [x] Import the LOW React interface and remove its direct dependency on `@appdeploy/client`.
+- [x] Add a first-party Node/Express API with SQLite, account sessions, chat/agent adapter, encrypted-vault persistence and defensive text review.
+- [x] Add basic in-memory API rate limits and configurable production origin allowlist.
+- [x] Add GitHub Actions CI; current verified run: typecheck, Vite build and tests succeeded before the rate-limit patch. A new run is checking the latest patch.
+- [ ] Add a committed npm lockfile and runtime API integration tests.
+- [ ] Complete CSRF strategy, durable rate limiting, account verification/recovery, backups and audit events.
+- [ ] Migrate real multimedia, voice, research browsing, tool execution and multi-device sync providers.
+- [ ] Build Android wrapper against a GitHub-hosted API; do not use the former AppDeploy URL.
+- [ ] Create staging deployment from this repository and cut over only after acceptance tests.
+
+### Current truth
+The frontend UI is present, but several visible modules are still placeholders or text-only. No production deployment has been switched to this GitHub backend. AppDeploy is no longer the development target; it remains an old deployment and migration source only.
