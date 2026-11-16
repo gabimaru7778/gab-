@@ -1,0 +1,42 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import express from "express";
+import { deviceHub } from "./device-hub";
+
+test("LOW Sync requires mutual approval and limits telemetry to an allowlist", async (t) => {
+  const app = express(); app.use(express.json()); app.use("/api/devices", deviceHub);
+  const server = app.listen(0);
+  await new Promise<void>((resolve) => server.once("listening", resolve));
+  t.after(async () => { await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve())); });
+  const address = server.address();
+  assert.ok(address && typeof address === "object");
+  const base = `http://127.0.0.1:${address.port}/api/devices`;
+  const request = async (path: string, init?: RequestInit) => {
+    const response = await fetch(base + path, init);
+    return { status: response.status, body: await response.json() as Record<string, any> };
+  };
+  const created = await request("/pairings", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ deviceName: "Equipo A" }) });
+  assert.equal(created.status, 201);
+  const { pairingId, code, ownerSecret } = created.body;
+  const claimed = await request("/pairings/claim", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ code, deviceName: "Equipo B", consent: true }) });
+  assert.equal(claimed.status, 202);
+  const claimSecret = claimed.body.claimSecret;
+  const denied = await request(`/pairings/${pairingId}/approve`, { method: "POST" });
+  assert.equal(denied.status, 401);
+  const approved = await request(`/pairings/${pairingId}/approve`, { method: "POST", headers: { "x-low-pair-secret": ownerSecret } });
+  assert.equal(approved.status, 200);
+  const ownerToken = approved.body.accessToken;
+  const claimant = await request(`/pairings/${pairingId}/claim-status`, { headers: { "x-low-claim-secret": claimSecret } });
+  assert.equal(claimant.body.state, "approved");
+  const badTelemetry = await request("/heartbeat", { method: "POST", headers: { authorization: "Bearer " + ownerToken, "content-type": "application/json" }, body: JSON.stringify({ cameraFrame: "not-allowed" }) });
+  assert.equal(badTelemetry.status, 400);
+  const heartbeat = await request("/heartbeat", { method: "POST", headers: { authorization: "Bearer " + ownerToken, "content-type": "application/json" }, body: JSON.stringify({ appState: "foreground", network: "online" }) });
+  assert.equal(heartbeat.status, 200);
+  const listed = await request("/", { headers: { authorization: "Bearer " + ownerToken } });
+  assert.equal(listed.body.devices.length, 1);
+  assert.equal(listed.body.devices[0].name, "Equipo B");
+  const revoked = await request("/" + listed.body.devices[0].id, { method: "DELETE", headers: { authorization: "Bearer " + ownerToken } });
+  assert.equal(revoked.body.revoked, true);
+  const after = await request("/", { headers: { authorization: "Bearer " + ownerToken } });
+  assert.equal(after.status, 401);
+});

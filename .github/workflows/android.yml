@@ -1,0 +1,55 @@
+name: LOW Android APK
+on:
+  workflow_dispatch:
+  push:
+    branches: ["feature/low-operating-system"]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "index.html"
+      - "package.json"
+      - "capacitor.config.ts"
+      - ".github/workflows/android.yml"
+permissions:
+  contents: read
+concurrency:
+  group: low-android-apk-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm install
+      - name: Build web assets for Android
+        run: npm run build
+        env:
+          VITE_LOW_API_URL: ${{ vars.LOW_API_URL }}
+      - run: npx cap add android
+      - run: npx cap sync android
+      - name: Build debug APK
+        run: cd android && ./gradlew --no-daemon --build-cache assembleDebug
+      - name: Verify and checksum APK
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk | tee android/app/build/outputs/apk/debug/app-debug.apk.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: low-android-debug-apk
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/outputs/apk/debug/app-debug.apk.sha256
+          if-no-files-found: error
+          retention-days: 14

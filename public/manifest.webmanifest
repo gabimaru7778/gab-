@@ -1,0 +1,16 @@
+{
+  "id": "/",
+  "name": "LOW · Personal Intelligence",
+  "short_name": "LOW",
+  "description": "Asistente personal modular y centro de control.",
+  "lang": "es-MX",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#090811",
+  "theme_color": "#090811",
+  "orientation": "any",
+  "icons": [
+    { "src": "/low-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -1,39 +1,41 @@
-# LOW
+# LOW — Personal Intelligence
 
-LOW is a modular personal AI workspace. This repository is the source-control home for the LOW application and its planned migration away from a single hosting runtime.
+LOW is a modular personal AI workspace, not a login-page project or a single-purpose chatbot. This repository now starts with the LOW operating interface: control center, assistant shell, local network/API diagnostics, local JSON/CSV validation, and clear connection states for integrations.
 
-## Current migration baseline
+## Current foundation
 
-The existing deployed application is a React + TypeScript frontend with an AppDeploy TypeScript backend. The first migration stage preserves existing behavior and documents runtime dependencies before changing providers or infrastructure.
+- Spanish-first responsive interface with obsidian/violet visual identity and LOW holographic core.
+- Navigation for LOW CORE, agents, GitHub Developer, network, data validation, creator and settings.
+- Local network check measures browser connectivity and the LOW API health endpoint only.
+- JSON validation (syntax + required keys) and strict CSV structure validation run in the browser; input is not uploaded.
+- Academy Lab includes offline SQL-authentication and Wi-Fi network simulations with fictional accounts/devices; neither executes SQL, creates an access point, scans, captures traffic or contacts external systems.
+- Network Lab presents a step-by-step execution trace, fictional topology, synthetic events, defensive detection of simulated stealth behavior, synthetic sensor-permission scenarios, emergency virtual-node shutdown and an audit trail preserved when ephemeral lab state is cleared.
+- Backend health endpoint reports service state and whether a provider credential exists without exposing it.
+- Helmet, rate limiting, request-size limits, same-origin deployment and server-side secrets.
+- No login page in this foundation and no false claim that external providers are connected.
 
-## Architecture direction
+## Run
 
-- CORE: model routing, orchestration, policy and response composition
-- MEMORY: user-controlled encrypted memory and retrieval
-- RESEARCH: source-grounded research and retrieval
-- DEVELOPER: code analysis, patch proposals and test execution
-- CREATOR: image and video provider adapters
-- VOICE: speech input/output adapters
-- WORK: bounded agents and durable task execution
-- CONNECT: external APIs and tool adapters
-- CLOUD: storage, jobs and deployment adapters
-- SHIELD: defensive security review and audit logging
-- LEARNING: evaluation, regression tests and improvement proposals
+- Node.js 22+
+- `npm install`
+- `npm run dev`
 
-## Safety and engineering principles
+The frontend runs on Vite and proxies `/api` to Express on port 3001. The server uses an exact origin allowlist (`APP_ORIGINS`); native Capacitor Android uses `https://localhost` with the configured `androidScheme`, while a deployed PWA origin must be added explicitly.
 
-1. Provider credentials are server-side secrets and must never be committed.
-2. Agents propose changes in isolated branches; tests and human approval gate production deployment.
-3. Security testing is limited to owned systems, explicit authorization, and safe passive review or controlled labs.
-4. Model providers are adapters, not hard-coded assumptions.
-5. Every capability must be marked as implemented, experimental, or planned.
+## Configuration
 
-## Migration stages
+Provider credentials belong in the hosting environment, never in the browser or repository. No live model adapter is connected in this foundation. For Android, set the repository Actions variable `LOW_API_URL` to the public HTTPS origin of the deployed LOW API before building; without it the APK can open its local interface but cannot reach a remote API.
 
-1. Import and verify the existing application source.
-2. Add reproducible build, typecheck and regression tests.
-3. Separate provider adapters and configuration.
-4. Add controlled agent workflows and observability.
-5. Deploy a staging environment before production cutover.
+## Roadmap modules
 
-See `docs/ROADMAP.md` for the staged plan.
+LOW CORE, ROUTER, MEMORY, RESEARCH, DEVELOPER, AGENTS, CREATOR, VOICE, WORK, CONNECT, CLOUD, SHIELD, CONTROL, NETWORK, DATA, MULTIDEVICE and ANDROID.
+
+## Honest capability status
+
+- Implemented: responsive shell, navigation, local JSON/CSV validation, browser online state, LOW API health check.
+- LOW Sync: consent-based code pairing, authenticated device tokens, heartbeat telemetry (app foreground/background + network state), linked-device status and bilateral revocation are implemented in the API/UI. Sessions are in-memory and disappear on server restart; deploy the API over HTTPS before testing across devices.
+- Not connected: live AI providers, GitHub App/OAuth inside LOW, agent runtime, persistent cloud jobs, private memory sync, voice, media generation and native Bluetooth/Companion Device Manager integration.
+- Android: Capacitor debug APK is produced by CI; it remains a test build and requires hardware QA and release signing.
+- Remote device visibility is limited to explicit LOW app telemetry; no remote screen, file, location, camera, microphone or OS-level control is provided.
+
+This is a foundation build, not a production-ready release. Run CI and test the deployment on actual target devices before treating integrations as operational.
