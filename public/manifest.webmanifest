@@ -1,0 +1,16 @@
+{
+  "id": "/",
+  "name": "GPT-6 Cyber Lab",
+  "short_name": "Cyber Lab",
+  "description": "Laboratorio de ciberseguridad defensiva.",
+  "lang": "es-MX",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#090811",
+  "theme_color": "#090811",
+  "orientation": "any",
+  "icons": [
+    { "src": "/cyber-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

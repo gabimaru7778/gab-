@@ -1,39 +1,50 @@
-# LOW
+# GPT-6 Cyber Lab
 
-LOW is a modular personal AI workspace. This repository is the source-control home for the LOW application and its planned migration away from a single hosting runtime.
+An original, responsive defensive-security workspace in the LOW repository. This project does **not** reproduce OpenAI model weights, proprietary training, or private systems. It provides a mobile-first Progressive Web App (PWA), a scoped defensive-review workflow, and an optional server-side model adapter.
 
-## Current migration baseline
+## Included in this branch
 
-The existing deployed application is a React + TypeScript frontend with an AppDeploy TypeScript backend. The first migration stage preserves existing behavior and documents runtime dependencies before changing providers or infrastructure.
+- Responsive React + TypeScript interface for phones, tablets, and desktop browsers.
+- Installable PWA manifest and basic offline app-shell cache.
+- Spanish dashboard for authorized defensive reviews.
+- Review categories: configuration, code, dependency/supply-chain, and hardening plans.
+- Server-side model adapter using the OpenAI Responses API.
+- Local demonstration mode when no provider credential is configured.
+- Authorization confirmation, Zod input validation, request size limit, rate limiting, Helmet, and server-only API credentials.
 
-## Architecture direction
+## Requirements
 
-- CORE: model routing, orchestration, policy and response composition
-- MEMORY: user-controlled encrypted memory and retrieval
-- RESEARCH: source-grounded research and retrieval
-- DEVELOPER: code analysis, patch proposals and test execution
-- CREATOR: image and video provider adapters
-- VOICE: speech input/output adapters
-- WORK: bounded agents and durable task execution
-- CONNECT: external APIs and tool adapters
-- CLOUD: storage, jobs and deployment adapters
-- SHIELD: defensive security review and audit logging
-- LEARNING: evaluation, regression tests and improvement proposals
+- Node.js 20+
+- npm
+- An API credential for an organization approved to use the configured model, if live AI analysis is required.
 
-## Safety and engineering principles
+## Run locally
 
-1. Provider credentials are server-side secrets and must never be committed.
-2. Agents propose changes in isolated branches; tests and human approval gate production deployment.
-3. Security testing is limited to owned systems, explicit authorization, and safe passive review or controlled labs.
-4. Model providers are adapters, not hard-coded assumptions.
-5. Every capability must be marked as implemented, experimental, or planned.
+```bash
+npm install
+cp .env.example .env
+npm run dev
+```
 
-## Migration stages
+Open the Vite URL printed in the terminal (normally http://localhost:5173). The frontend proxies `/api` to the Express server on port 3001.
 
-1. Import and verify the existing application source.
-2. Add reproducible build, typecheck and regression tests.
-3. Separate provider adapters and configuration.
-4. Add controlled agent workflows and observability.
-5. Deploy a staging environment before production cutover.
+To enable live model responses, set `OPENAI_API_KEY` in the server-side `.env` file and set `OPENAI_MODEL` to a model your organization is authorized to use. The default is `gpt-6-cyber`; access is restricted by OpenAI and is not guaranteed for every API account. Never place keys in frontend code or browser storage.
 
-See `docs/ROADMAP.md` for the staged plan.
+## Production
+
+```bash
+npm run build
+NODE_ENV=production npm start
+```
+
+The Express server serves the built frontend and API from the same origin. Configure `APP_ORIGIN`, `PORT`, and secrets in the hosting provider's environment settings.
+
+## Security boundary
+
+This initial version is deliberately limited to analysis of user-provided, sanitized text. It does not scan hosts, connect to targets, execute shell commands, generate operational exploit payloads, or modify systems. A checkbox is not proof of ownership; keep reviews limited to assets you own or are explicitly authorized to assess. Human review is required before applying recommendations.
+
+Do not paste secrets, access tokens, private personal data, or production credentials into the form. Demo mode produces a static checklist, not a genuine security assessment.
+
+## Current status
+
+This is an initial scaffold and should be typechecked, built, reviewed, and deployed to staging before production use. Work is isolated in branch `feature/gpt-6-cyber-lab`.
