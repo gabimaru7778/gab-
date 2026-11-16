@@ -299,7 +299,7 @@ export default function App() {
         passphrase
       );
       const r = await api.post('/api/vault', encrypted);
-      const row = r.data.item as VaultRecord;
+      const row = r.data.record as VaultRecord;
       setVaultRows(v => [row, ...v]);
       setNotes(v => [
         {
