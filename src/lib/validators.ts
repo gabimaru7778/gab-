@@ -35,8 +35,8 @@ export function validateCsv(raw: string): ValidationResult {
       else field += char;
     } else if (char === '"' && field.length === 0) quoted = true;
     else if (char === ",") { row.push(field.trim()); field = ""; }
-    else if (char === "\\n" || char === "\\r") {
-      if (char === "\\r" && raw[i + 1] === "\\n") i += 1;
+    else if (char === "\n" || char === "\r") {
+      if (char === "\r" && raw[i + 1] === "\n") i += 1;
       row.push(field.trim()); field = "";
       if (row.some((value) => value.length > 0)) rows.push(row);
       row = [];
