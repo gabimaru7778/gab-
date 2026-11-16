@@ -859,6 +859,23 @@ export default function App() {
             </div>
           </section>
         )}
+        {page === 'Higgsfield Studio' && (
+          <section className="content">
+            <small>CREATOR / HIGGSFIELD API</small>
+            <h1>Imagina. <em>LOW lo crea.</em></h1>
+            <p>Generación de imágenes y vídeo desde el chat, con trabajos asíncronos y consulta de estado en el servidor.</p>
+            <article className="learningCard">
+              <h3>{higgsfieldConfigured ? 'Proveedor conectado' : 'Falta conectar el proveedor'}</h3>
+              <p>{higgsfieldConfigured ? 'LOW detecta las dos credenciales del servidor. La disponibilidad y el saldo se confirman al enviar una generación.' : 'Configura HF_API_KEY_ID y HF_API_KEY_SECRET como secretos del entorno donde se ejecuta el backend. Nunca pegues estas claves en el chat ni en el repositorio.'}</p>
+              <small className="subtle">La API de Higgsfield se factura por separado de una suscripción web y puede consumir saldo por cada generación. Revisa el modelo, duración y coste antes de usarla.</small>
+            </article>
+            <div className="grid">
+              <article><Sparkles /><h3>Crear imagen</h3><p>Soul Standard · texto a imagen · 720p por defecto</p><button className="primary" onClick={() => { setMode('Imagen'); setPage('Chat'); }}>Abrir creador de imágenes <ArrowUp size={15} /></button></article>
+              <article><Activity /><h3>Crear vídeo</h3><p>Seedance 2.0 · texto a vídeo · clip de 5 segundos por defecto</p><button className="primary" onClick={() => { setMode('Video'); setPage('Chat'); }}>Abrir creador de vídeo <ArrowUp size={15} /></button></article>
+            </div>
+            <p className="subtle">No se ejecuta ninguna generación al abrir esta pantalla. Solo se cobra al enviar una solicitud al proveedor. Los resultados se consultan con un token temporal y expiran a las 24 horas en LOW.</p>
+          </section>
+        )}
         <footer className="foot">
           LOW INTELLIGENCE SYSTEMS <span>BUILD 03.1 · IMAGE + AGENT CORE</span>
         </footer>
