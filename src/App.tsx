@@ -374,6 +374,16 @@ export default function App() {
     recognitionRef.current?.stop?.();
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   }, []);
+  async function revokeKey(id: string) {
+    try {
+      await api.delete('/api/keys/' + encodeURIComponent(id));
+      setKeys(current => current.filter(key => key.id !== id));
+      setToast('Clave revocada. Los clientes que la usaban ya no podrán autenticarse.');
+      if (newKey) setNewKey('');
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'No se pudo revocar la clave.');
+    }
+  }
   async function runScan() {
     if (!user) {
       setErr('Inicia sesión para utilizar Cyber Lab. El resto de LOW sigue disponible sin cuenta.');
@@ -689,9 +699,9 @@ export default function App() {
               <em>con otros agentes.</em>
             </h1>
             <p>
-              API compatible con el formato OpenAI Chat Completions. Configúrala
+              API compatible con OpenAI Chat Completions para clientes servidor-a-servidor. Configúrala
               en clientes y agentes que acepten un endpoint personalizado,
-              incluidos conectores compatibles con Grok/xAI y otros proveedores.
+              incluidos agentes que permitan endpoint personalizado y autenticación Bearer. No expongas esta clave en código de navegador.
             </p>
             <div className="endpoint">
               <label>BASE URL</label>
@@ -738,6 +748,7 @@ export default function App() {
                 <KeyRound size={16} />
                 <span>{k.label}</span>
                 <small>{new Date(k.createdAt).toLocaleDateString()}</small>
+                <button type="button" className="keyRevoke" onClick={() => revokeKey(k.id)} aria-label={'Revocar clave ' + k.label}>Revocar</button>
               </div>
             ))}
             <p className="subtle">
