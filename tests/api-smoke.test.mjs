@@ -9,7 +9,8 @@ const port=34671,base='http://127.0.0.1:'+port,dir=mkdtempSync(join(tmpdir(),'lo
 let child,output='';
 before(async()=>{
  child=spawn(process.execPath,['--import','tsx','server/index.ts'],{cwd:process.cwd(),env:{...process.env,PORT:String(port),NODE_ENV:'test',LOW_DATA_DIR:dir},stdio:['ignore','pipe','pipe']});
- child.stdout.on('data',b=>output+=b.toString());child.stderr.on('data',b=>output+=b.toString());\n let ready=false;
+ child.stdout.on('data',b=>output+=b.toString());child.stderr.on('data',b=>output+=b.toString());
+ let ready=false;
  for(let i=0;i<60;i++){try{const r=await fetch(base+'/api/health');if(r.ok){ready=true;break;}}catch{}await new Promise(r=>setTimeout(r,250));}
  assert.equal(ready,true,'API server should become healthy. Process output: '+output);
 });
