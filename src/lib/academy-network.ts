@@ -84,7 +84,7 @@ export function simulateSensorConsent(sensor: LabSensor, approved: boolean): Lab
 export function simulateEmergencyShutdown(): LabEvent[] {
   return [
     { id: "shutdown-1", title: "Parada de emergencia", detail: "Se detuvo la actividad del nodo virtual y se revocaron sus acciones simuladas.", severity: "warning" },
-    { id: "shutdown-2", title: "Estado efímero eliminado", detail: "Se limpió únicamente la memoria del escenario; no se modificaron archivos ni dispositivos reales.", severity: "success" },
+    { id: "shutdown-2", title: "Estado efímero eliminado", detail: "Estado efímero eliminado: se limpió únicamente la memoria del escenario; no se modificaron archivos ni dispositivos reales.", severity: "success" },
     { id: "shutdown-3", title: "Auditoría preservada", detail: "Los eventos de seguridad permanecen disponibles para análisis académico.", severity: "success" }
   ];
 }
