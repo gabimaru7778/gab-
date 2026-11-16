@@ -1,4 +1,4 @@
-import { createHash, randomBytes, randomUUID } from "node:crypto";
+import { createHash, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import { Router, type Request, type Response } from "express";
 
 type Telemetry = { batteryPercent?: number | null; appState?: "foreground" | "background" | "idle"; network?: "online" | "offline"; lastSeen: number };
@@ -8,14 +8,14 @@ const pairings = new Map<string, Pairing>();
 const devices = new Map<string, Device>();
 const hash = (value: string) => createHash("sha256").update(value).digest("hex");
 const token = () => randomBytes(32).toString("base64url");
-const safeEqual = (a: string | undefined, b: string) => Boolean(a && a.length === b.length && hash(a) === hash(b));
+const matchesHash = (value: string | undefined, expectedHash: string | undefined) => { if (!value || !expectedHash) return false; const actual = Buffer.from(hash(value)); const expected = Buffer.from(expectedHash); return actual.length === expected.length && timingSafeEqual(actual, expected); };
 const cleanName = (value: unknown) => typeof value === "string" ? value.trim().slice(0, 48) : "";
 const bearer = (req: Request) => req.header("authorization")?.replace(/^Bearer\s+/i, "");
-function getDevice(req: Request) { const supplied = bearer(req); return [...devices.values()].find((d) => !d.revoked && supplied && safeEqual(supplied, d.tokenHash)); }
+function getDevice(req: Request) { const supplied = bearer(req); return [...devices.values()].find((d) => !d.revoked && supplied && matchesHash(supplied, d.tokenHash)); }
 function authPair(req: Request, res: Response, pair: Pairing, kind: "owner" | "claim") {
   const supplied = req.header(kind === "owner" ? "x-low-pair-secret" : "x-low-claim-secret");
   const expected = kind === "owner" ? pair.ownerSecretHash : pair.claimSecretHash;
-  if (!supplied || !expected || !safeEqual(hash(supplied), expected)) { res.status(401).json({ error: "No autorizado" }); return false; }
+  if (!supplied || !expected || !matchesHash(supplied, expected)) { res.status(401).json({ error: "No autorizado" }); return false; }
   return true;
 }
 function expirePairs() { const now = Date.now(); for (const [id, p] of pairings) if (p.expiresAt < now && p.state !== "approved") pairings.delete(id); }
@@ -36,7 +36,7 @@ deviceHub.post("/pairings/claim", (req, res) => {
   const code = typeof req.body?.code === "string" ? req.body.code.trim().toUpperCase() : "";
   const deviceName = cleanName(req.body?.deviceName);
   if (!/^[A-F0-9]{8}$/.test(code) || !deviceName || req.body?.consent !== true) return res.status(400).json({ error: "Código, nombre y consentimiento explícito son obligatorios" });
-  const pair = [...pairings.values()].find((p) => p.state === "pending" && p.expiresAt > Date.now() && safeEqual(hash(code), p.codeHash));
+  const pair = [...pairings.values()].find((p) => p.state === "pending" && p.expiresAt > Date.now() && matchesHash(code, p.codeHash));
   if (!pair) return res.status(404).json({ error: "Código inválido o expirado" });
   const claimSecret = token();
   pair.state = "claimed"; pair.claimSecretHash = hash(claimSecret); pair.claimantName = deviceName;
