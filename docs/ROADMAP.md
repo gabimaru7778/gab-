@@ -44,3 +44,10 @@
 
 ## Current known baseline
 The recovered AppDeploy snapshot is version `1794036989678`. It contains a React/TypeScript UI, a TypeScript backend, a calculator tool, a client-side encrypted vault flow, an initial agent endpoint, Higgsfield media integration and a passive authorized security-review route. These are baseline observations, not a claim that every external provider or workflow is fully operational.
+
+
+## Security Lab V3
+- [ ] Implement the defensive lab modules and controls specified in [SECURITY-LAB-V3.md](SECURITY-LAB-V3.md).
+- [ ] Add runtime permission enforcement, enrollment and revocation.
+- [ ] Add isolated simulator fixtures and automated acceptance tests.
+- [ ] Run CI and staging verification; mark modules implemented only with test evidence.
