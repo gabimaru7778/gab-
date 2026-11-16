@@ -62,20 +62,18 @@ export default function App() {
   }, []);
   useEffect(() => {
     if (!autoRunLab) return;
-    const timer = window.setInterval(() => {
-      setExecutionIndex((current) => {
-        if (current >= executionTrace.length - 1) {
-          setAutoRunLab(false);
-          return current;
-        }
-        const next = current + 1;
-        setExecutionTrace((steps) => steps.map((step, index) => ({ ...step, status: index <= next ? "completed" : "planned" })));
-        setAuditLog((log) => [...log, new Date().toLocaleTimeString("es-MX") + " · Ejecución en directo: paso " + (next + 1)]);
-        return next;
-      });
+    if (executionIndex >= executionTrace.length - 1) {
+      setAutoRunLab(false);
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      const next = executionIndex + 1;
+      setExecutionIndex(next);
+      setExecutionTrace((steps) => steps.map((step, index) => ({ ...step, status: index <= next ? "completed" : "planned" })));
+      setAuditLog((log) => [...log, new Date().toLocaleTimeString("es-MX") + " · Ejecución en directo: paso " + (next + 1)]);
     }, 900);
-    return () => window.clearInterval(timer);
-  }, [autoRunLab, executionTrace.length]);
+    return () => window.clearTimeout(timer);
+  }, [autoRunLab, executionIndex, executionTrace.length]);
 
   async function runNetworkCheck() {
     setNetworkBusy(true);
