@@ -49,7 +49,7 @@ export default function App() {
     setNetworkBusy(true);
     const started = performance.now();
     try {
-      const apiBase = (import.meta.env.VITE_LOW_API_URL || "").replace(/\\/$/, "");
+      const apiBase = import.meta.env.VITE_LOW_API_URL || "";
       const response = await fetch(apiBase + "/api/health", { cache: "no-store" });
       if (!response.ok) throw new Error("API respondió con HTTP " + response.status);
       const data = await response.json() as { ok?: boolean; mode?: string };
