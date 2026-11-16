@@ -49,7 +49,8 @@ export default function App() {
     setNetworkBusy(true);
     const started = performance.now();
     try {
-      const response = await fetch("/api/health", { cache: "no-store" });
+      const apiBase = (import.meta.env.VITE_LOW_API_URL || "").replace(/\\/$/, "");
+      const response = await fetch(apiBase + "/api/health", { cache: "no-store" });
       if (!response.ok) throw new Error("API respondió con HTTP " + response.status);
       const data = await response.json() as { ok?: boolean; mode?: string };
       setNetworkResult({ online: navigator.onLine, latencyMs: Math.round(performance.now() - started), checkedAt: new Date().toLocaleString("es-MX"), api: data.ok ? "Disponible · " + (data.mode || "servicio") : "Respuesta inesperada" });
