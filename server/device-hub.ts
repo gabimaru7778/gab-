@@ -71,6 +71,8 @@ deviceHub.get("/pairings/:id/claim-status", (req, res) => {
 deviceHub.post("/heartbeat", (req, res) => {
   const device = getDevice(req);
   if (!device) return res.status(401).json({ error: "Dispositivo no autorizado o vínculo revocado" });
+  const allowedKeys = new Set(["batteryPercent", "appState", "network"]);
+  if (Object.keys(req.body || {}).some((key) => !allowedKeys.has(key))) return res.status(400).json({ error: "Campo de telemetría no permitido" });
   const battery = req.body?.batteryPercent;
   const appState = req.body?.appState;
   const network = req.body?.network;
