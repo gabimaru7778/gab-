@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
-  Activity, ArrowUpRight, AudioLines, Bot, Check, CheckCircle2, ChevronRight,
-  CircleDot, Code2, Cpu, Database, FileCheck2, FileJson, FileText, Globe2,
+  Activity, ArrowUpRight, AudioLines, Bot, CheckCircle2, ChevronRight,
+  Code2, Cpu, Database, FileCheck2, FileJson, FileText, Globe2,
   Github, HardDrive, Image, Layers3, LockKeyhole, Menu, Mic2, Network,
   RadioTower, RefreshCw, ScanLine, Search, Send, Settings2, ShieldCheck,
-  Sparkles, Upload, Wifi, X, Zap
+  Sparkles, Wifi, X, Zap
 } from "lucide-react";
 
 type Section = "overview" | "assistant" | "network" | "data" | "developer" | "agents" | "creator" | "settings";
@@ -43,14 +43,35 @@ function validateInput(raw: string, required: string): ValidationResult {
 }
 
 function parseCsv(raw: string): ValidationResult {
-  const lines = raw.trim().split(/\r?\n/).filter(Boolean);
-  if (lines.length < 2) return { valid: false, message: "CSV incompleto.", details: ["Se requiere una fila de encabezados y al menos una fila de datos."] };
-  const headers = lines[0].split(",").map((v) => v.trim());
-  const duplicates = headers.filter((v, i) => v && headers.indexOf(v) !== i);
-  const widths = lines.slice(1).map((line, i) => ({ row: i + 2, count: line.split(",").length })).filter((row) => row.count !== headers.length);
-  const details = [headers.length + " columnas detectadas.", lines.length - 1 + " filas de datos."];
-  if (duplicates.length) details.push("Encabezados duplicados: " + [...new Set(duplicates)].join(", "));
-  if (widths.length) details.push("Filas con número de columnas distinto: " + widths.map((r) => r.row).join(", "));
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
+  let quoted = false;
+  for (let i = 0; i < raw.length; i += 1) {
+    const char = raw[i];
+    if (quoted) {
+      if (char === '"' && raw[i + 1] === '"') { field += '"'; i += 1; }
+      else if (char === '"') quoted = false;
+      else field += char;
+    } else if (char === '"' && field.length === 0) quoted = true;
+    else if (char === ",") { row.push(field.trim()); field = ""; }
+    else if (char === "\\n" || char === "\\r") {
+      if (char === "\\r" && raw[i + 1] === "\\n") i += 1;
+      row.push(field.trim()); field = "";
+      if (row.some((value) => value.length > 0)) rows.push(row);
+      row = [];
+    } else field += char;
+  }
+  if (quoted) return { valid: false, message: "CSV no válido.", details: ["Hay un campo entre comillas que no se cerró."] };
+  row.push(field.trim());
+  if (row.some((value) => value.length > 0)) rows.push(row);
+  if (rows.length < 2) return { valid: false, message: "CSV incompleto.", details: ["Se requiere una fila de encabezados y al menos una fila de datos."] };
+  const headers = rows[0];
+  const duplicates = headers.filter((value, index) => !value || headers.indexOf(value) !== index);
+  const widths = rows.slice(1).map((values, index) => ({ row: index + 2, count: values.length })).filter((item) => item.count !== headers.length);
+  const details = [headers.length + " columnas detectadas.", rows.length - 1 + " filas de datos."];
+  if (duplicates.length) details.push("Encabezados vacíos o duplicados: " + [...new Set(duplicates)].join(", "));
+  if (widths.length) details.push("Filas con número de columnas distinto: " + widths.map((item) => item.row).join(", "));
   return { valid: !duplicates.length && !widths.length, message: duplicates.length || widths.length ? "Se encontraron inconsistencias." : "Estructura CSV consistente.", details };
 }
 
@@ -67,7 +88,6 @@ export default function App() {
   const [csvValidation, setCsvValidation] = useState<ValidationResult | null>(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<string[]>(["Hola. Soy LOW. Mi interfaz principal está lista; conecta un proveedor de modelos desde la configuración del servidor para habilitar respuestas inteligentes."]);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const update = () => setOnline(navigator.onLine);
