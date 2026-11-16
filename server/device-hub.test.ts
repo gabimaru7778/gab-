@@ -29,7 +29,9 @@ test("LOW Sync requires mutual approval and limits telemetry to an allowlist", a
   const claimant = await request(`/pairings/${pairingId}/claim-status`, { headers: { "x-low-claim-secret": claimSecret } });
   assert.equal(claimant.body.state, "approved");
   const badTelemetry = await request("/heartbeat", { method: "POST", headers: { authorization: "Bearer " + ownerToken, "content-type": "application/json" }, body: JSON.stringify({ cameraFrame: "not-allowed" }) });
-  assert.equal(badTelemetry.status, 200);
+  assert.equal(badTelemetry.status, 400);
+  const heartbeat = await request("/heartbeat", { method: "POST", headers: { authorization: "Bearer " + ownerToken, "content-type": "application/json" }, body: JSON.stringify({ appState: "foreground", network: "online" }) });
+  assert.equal(heartbeat.status, 200);
   const listed = await request("/", { headers: { authorization: "Bearer " + ownerToken } });
   assert.equal(listed.body.devices.length, 1);
   assert.equal(listed.body.devices[0].name, "Equipo B");
