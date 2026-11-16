@@ -31,14 +31,14 @@ LOW se desarrolla como un asistente personal operativo y modular, no como una p�
 | LOW NETWORK | Diagnóstico de conectividad y redes propias autorizadas. |
 | LOW DATA | Validación, calidad, normalización y análisis de archivos/datos. |
 | LOW MULTIDEVICE | Web instalable, continuidad y sincronización segura. |
-| LOW ANDROID | Aplicación Android mediante Capacitor, APK de prueba y releases firmadas. |
+| LOW ACADEMY | Simulaciones educativas locales, ficticias y aisladas para autenticación, validación y conceptos de seguridad. |\n| LOW ANDROID | Aplicación Android mediante Capacitor, APK de prueba y releases firmadas. |
 
 ## Estado real de esta base
 
-- Implementado: interfaz modular, navegación responsive, panel de estado, diagnóstico de conexión navegador/API, validación local JSON y CSV, PWA rebrandeada.
+- Implementado: interfaz modular, navegación responsive, panel de estado, diagnóstico de conexión navegador/API, validación local JSON/CSV, simulador académico de autenticación SQL en memoria y PWA rebrandeada.
 - Pendiente de conexión: modelos, GitHub App/OAuth propio de LOW, agentes, memoria persistente, nube, voz, generadores multimedia y automatizaciones.
 - En preparación: configuración Capacitor y flujo de compilación Android.
-- No implementado: escaneo activo de redes, ejecución remota, control de dispositivos ni acciones de escritura autónomas.
+- No implementado: escaneo activo de redes, ejecución remota, control de dispositivos, sincronización real multidispositivo ni acciones de escritura autónomas.
 
 ## Modelos y agentes
 
