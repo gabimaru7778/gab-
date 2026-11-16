@@ -7,7 +7,7 @@ LOW is a modular personal AI workspace, not a login-page project or a single-pur
 - Spanish-first responsive interface with obsidian/violet visual identity and LOW holographic core.
 - Navigation for LOW CORE, agents, GitHub Developer, network, data validation, creator and settings.
 - Local network check measures browser connectivity and the LOW API health endpoint only.
-- JSON validation (syntax + required keys) and CSV structure validation run in the browser; input is not uploaded.
+- JSON validation (syntax + required keys) and strict CSV structure validation run in the browser; input is not uploaded.\n- Academy Lab includes an offline SQL-authentication teaching simulation with fictional accounts; it does not execute SQL or contact external systems.
 - Backend health endpoint reports service state and whether a provider credential exists without exposing it.
 - Helmet, rate limiting, request-size limits, same-origin deployment and server-side secrets.
 - No login page in this foundation and no false claim that external providers are connected.
