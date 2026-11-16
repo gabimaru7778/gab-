@@ -19,7 +19,7 @@ export function simulateAuthLab(username: string, password: string, mode: AuthLa
   const injectionPattern = /(?:'|%27)\s*or\s*(?:'1'|'?1'?)\s*=\s*(?:'1'|'?1'?)/i;
   const injectionAttempt = injectionPattern.test(username) || injectionPattern.test(password);
   const queryPreview = mode === "vulnerable"
-    ? "SELECT * FROM users WHERE username = '" + username.replace(/'/g, "''") + "' AND password = '[entrada]';"
+    ? "SELECT * FROM users WHERE username = '" + username + "' AND password = '[entrada]';"
     : "SELECT * FROM users WHERE username = ? AND password = ?;  -- parámetros separados";
 
   if (mode === "vulnerable" && injectionAttempt) {
