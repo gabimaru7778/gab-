@@ -11,7 +11,13 @@ CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY,user_id TEXT NOT
 CREATE TABLE IF NOT EXISTS vault_records(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,title TEXT NOT NULL,salt TEXT NOT NULL,iv TEXT NOT NULL,ciphertext TEXT NOT NULL,created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS api_keys(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,label TEXT NOT NULL,key_hash TEXT NOT NULL,created_at TEXT NOT NULL,last_used_at TEXT);`);
 app.disable('x-powered-by');app.use(express.json({limit:'1mb'}));
-app.use((q,r,n)=>{r.setHeader('X-Content-Type-Options','nosniff');r.setHeader('Referrer-Policy','strict-origin-when-cross-origin');r.setHeader('X-Frame-Options','DENY');if(prod&&q.headers.origin&&q.headers.origin!==process.env.APP_ORIGIN){r.status(403).json({error:'Origen no permitido.'});return;}n();});
+const buckets=new Map<string,{count:number;reset:number}>();
+function rateLimit(max:number,windowMs:number){return (q:express.Request,r:express.Response,n:express.NextFunction)=>{const key=(q.ip||q.socket.remoteAddress||'unknown')+':'+q.path,now=Date.now();let entry=buckets.get(key);if(!entry||entry.reset<now){entry={count:0,reset:now+windowMs};buckets.set(key,entry);}entry.count++;if(buckets.size>5000){for(const [k,v] of buckets)if(v.reset<now)buckets.delete(k);}r.setHeader('RateLimit-Limit',String(max));r.setHeader('RateLimit-Remaining',String(Math.max(0,max-entry.count)));if(entry.count>max){r.setHeader('Retry-After',String(Math.ceil((entry.reset-now)/1000)));r.status(429).json({error:'Demasiadas solicitudes. Espera antes de volver a intentarlo.'});return;}n();};}
+app.use('/api/auth',rateLimit(12,15*60*1000));
+app.use('/api/guest/chat',rateLimit(30,60*1000));
+app.use('/api/guest/agent',rateLimit(12,60*1000));
+app.use('/api/cyber/review',rateLimit(8,60*1000));
+app.use((q,r,n)=>{r.setHeader('X-Content-Type-Options','nosniff');r.setHeader('Referrer-Policy','strict-origin-when-cross-origin');r.setHeader('X-Frame-Options','DENY');const allowed=(process.env.APP_ORIGINS||process.env.APP_ORIGIN||'').split(',').map(v=>v.trim()).filter(Boolean);if(prod&&q.headers.origin&&allowed.length&&!allowed.includes(q.headers.origin)){r.status(403).json({error:'Origen no permitido.'});return;}n();});
 const sha=(s:string)=>createHash('sha256').update(s).digest('hex'),cookie='low_session';
 function token(q:express.Request){return (q.headers.cookie||'').split(';').map(v=>v.trim()).find(v=>v.startsWith(cookie+'='))?.slice(cookie.length+1)||'';}
 function user(q:express.Request){const t=token(q);if(!t)return null;const s=db.prepare('SELECT user_id,expires_at FROM sessions WHERE token_hash=?').get(sha(t)) as any;if(!s||s.expires_at<Date.now()){if(s)db.prepare('DELETE FROM sessions WHERE token_hash=?').run(sha(t));return null;}return db.prepare('SELECT id,email,name FROM users WHERE id=?').get(s.user_id) as any||null;}
