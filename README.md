@@ -18,7 +18,7 @@ LOW is a modular personal AI workspace, not a login-page project or a single-pur
 - `npm install`
 - `npm run dev`
 
-The frontend runs on Vite and proxies `/api` to Express on port 3001.
+The frontend runs on Vite and proxies `/api` to Express on port 3001. The server uses an exact origin allowlist (`APP_ORIGINS`); native Capacitor Android uses `https://localhost` with the configured `androidScheme`, while a deployed PWA origin must be added explicitly.
 
 ## Configuration
 
