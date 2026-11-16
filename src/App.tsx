@@ -246,7 +246,13 @@ export default function App() {
         }
         if (mediaUrl) setMessages(v => [...v, { id: crypto.randomUUID(), role: 'assistant', content: kind === 'video' ? 'Vídeo creado con Higgsfield.' : 'Imagen creada con Higgsfield.', mediaUrl, mediaType: kind }]);
         else setMessages(v => [...v, { id: crypto.randomUUID(), role: 'assistant', content: 'La generación sigue en proceso. Vuelve a intentarlo en unos momentos desde Higgsfield Studio.' }]);
-      } else if (mode === 'Agente' || mode === 'Investigación' || mode === 'Matemáticas') {
+      } else if (mode === 'Investigación') {
+        const r = await api.post('/api/guest/research', { query: q });
+        const sourceText = Array.isArray(r.data.sources) && r.data.sources.length
+          ? '\\n\\nFuentes consultadas:\\n' + r.data.sources.map((s: { title?: string; url: string; snippet?: string }) => '- ' + (s.title || s.url) + ' — ' + s.url + (s.snippet ? '\\n  ' + s.snippet : '')).join('\\n')
+          : '';
+        setMessages(v => [...v, { id: crypto.randomUUID(), role: 'assistant', content: (r.data.answer || 'Resultados de búsqueda:') + sourceText }]);
+      } else if (mode === 'Agente' || mode === 'Matemáticas') {
         const r = await api.post('/api/guest/agent', { goal: q, mode });
         const sourceText = Array.isArray(r.data.sources) && r.data.sources.length ? '\\n\\nFuentes consultadas:\\n' + r.data.sources.map((s: { title?: string; url: string }) => '- ' + (s.title || s.url) + ' — ' + s.url).join('\\n') : '';
         setMessages(v => [...v, { id: crypto.randomUUID(), role: 'assistant', content: (r.data.reply || 'Tarea completada.') + sourceText }]);
