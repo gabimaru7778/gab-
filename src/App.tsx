@@ -188,7 +188,7 @@ export default function App() {
   useEffect(() => {
     if (page === 'Aprendizaje') {
       api.get('/api/learning/latest').then(r => {
-        setLearningReport(r.data.report || 'La primera autoevaluación se ejecutará en el próximo ciclo diario.');
+        setLearningReport(r.data.report || 'El scheduler todavía no está configurado; no hay ciclos automáticos activos.');
         setLearningAt(r.data.createdAt || '');
       }).catch(() => setLearningReport('No se pudo cargar la autoevaluación.'));
     }
@@ -275,7 +275,7 @@ export default function App() {
     if (!passphrase.trim()) return;
     try {
       const r = await api.get('/api/vault');
-      const rows = r.data.items as VaultRecord[];
+      const rows = r.data.records as VaultRecord[];
       const decoded: Note[] = [];
       for (const row of rows) {
         try {
@@ -608,13 +608,13 @@ export default function App() {
             </h1>
             <p>
               La bóveda cifra cada nota en tu dispositivo con AES‑256‑GCM antes
-              de enviarla. Tu contraseña no se transmite ni se guarda en LOW.
+              de enviarla. Los registros se guardan cifrados por cuenta; todavía no hay sincronización entre dispositivos ni recuperación de clave. Tu contraseña no se transmite ni se guarda en LOW.
             </p>
             <article className="learningCard">
-              <div><small>LOW SELF-REVIEW · CICLO DIARIO</small><h3>Autoevaluación del sistema</h3></div>
+              <div><small>LEARNING / ESTADO DEL MÓDULO</small><h3>Autoevaluación del sistema</h3></div>
               {learningAt && <small>{new Date(learningAt).toLocaleString()}</small>}
               <p>{learningReport || 'Preparando el primer ciclo de evaluación.'}</p>
-              <small className="subtle">LOW revisa su arquitectura y propone mejoras. No modifica su propio código, permisos ni protecciones sin pruebas y aprobación.</small>
+              <small className="subtle">El ciclo automático aún no está conectado. Esta sección mostrará informes cuando se configure un scheduler real.</small>
             </article>
             {!user && <div className="alert">La conversación y los modos de LOW funcionan sin cuenta. Para guardar la bóveda sincronizada y administrar claves API, inicia sesión de forma opcional.</div>}
             <div className="noteForm">
@@ -846,7 +846,7 @@ export default function App() {
                   <h3>{name}</h3>
                   <p>{desc}</p>
                   <label>
-                    {i < 3 ? 'BASE IMPLEMENTADA' : 'MÓDULO EN EXPANSIÓN'}
+                    {({CORE:'CHAT BASE · PROVEEDOR REQUERIDO',MEMORY:'BÓVEDA LOCAL CIFRADA',RESEARCH:'PENDIENTE · BÚSQUEDA REAL',DEVELOPER:'PENDIENTE · SANDBOX',CREATOR:'PENDIENTE · PROVEEDOR MULTIMEDIA',VOICE:'PARCIAL · NAVEGADOR',WORK:'PARCIAL · AGENTE DE TEXTO',CONNECT:'PARCIAL · API BEARER',CLOUD:'PENDIENTE · SINCRONIZACIÓN',SHIELD:'PARCIAL · ANÁLISIS DE TEXTO'})[id] || 'ESTADO NO DEFINIDO'}
                   </label>
                 </article>
               ))}
