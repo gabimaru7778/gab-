@@ -7,8 +7,9 @@ LOW is a modular personal AI workspace, not a login-page project or a single-pur
 - Spanish-first responsive interface with obsidian/violet visual identity and LOW holographic core.
 - Navigation for LOW CORE, agents, GitHub Developer, network, data validation, creator and settings.
 - Local network check measures browser connectivity and the LOW API health endpoint only.
-- JSON validation (syntax + required keys) and strict CSV structure validation run in the browser; input is not uploaded.\n- Academy Lab includes offline SQL-authentication and Wi-Fi network simulations with fictional accounts/devices; neither executes SQL, creates an access point, scans, captures traffic or contacts external systems.
-- Network Lab presents a step-by-step execution trace, fictional topology, synthetic events, defensive detection of simulated stealth behavior, and an audit trail preserved when the ephemeral lab state is cleared.
+- JSON validation (syntax + required keys) and strict CSV structure validation run in the browser; input is not uploaded.
+- Academy Lab includes offline SQL-authentication and Wi-Fi network simulations with fictional accounts/devices; neither executes SQL, creates an access point, scans, captures traffic or contacts external systems.
+- Network Lab presents a step-by-step execution trace, fictional topology, synthetic events, defensive detection of simulated stealth behavior, synthetic sensor-permission scenarios, emergency virtual-node shutdown and an audit trail preserved when ephemeral lab state is cleared.
 - Backend health endpoint reports service state and whether a provider credential exists without exposing it.
 - Helmet, rate limiting, request-size limits, same-origin deployment and server-side secrets.
 - No login page in this foundation and no false claim that external providers are connected.
@@ -33,7 +34,6 @@ LOW CORE, ROUTER, MEMORY, RESEARCH, DEVELOPER, AGENTS, CREATOR, VOICE, WORK, CON
 
 - Implemented: responsive shell, navigation, local JSON/CSV validation, browser online state, LOW API health check.
 - Not connected: live AI providers, GitHub App/OAuth inside LOW, agent runtime, persistent cloud jobs, private memory sync, voice, media generation and native device pairing.
-- Android: a debug APK artifact was built by GitHub Actions. It is a test build, not a signed release; install and hardware compatibility have not been tested here.
 - Android: Capacitor debug APK is produced by CI; it remains a test build and requires hardware QA and release signing.
 - Academy Network Lab: local-only simulation and transparent step trace implemented; real network discovery, remote device observation and native pairing are not implemented.
 
