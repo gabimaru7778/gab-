@@ -17,7 +17,7 @@ app.use(helmet({ contentSecurityPolicy: isProduction ? undefined : false, crossO
 app.use(cors({
   origin: (origin, callback) => callback(null, isAllowedOrigin(origin, allowedOrigins)),
   methods: ["GET", "POST", "DELETE"],
-  allowedHeaders: ["Content-Type"]
+  allowedHeaders: ["Content-Type", "Authorization", "X-LOW-Pair-Secret", "X-LOW-Claim-Secret"]
 }));
 app.use(express.json({ limit: "64kb" }));
 app.use("/api", rateLimit({
