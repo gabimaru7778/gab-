@@ -73,3 +73,18 @@ export function simulateStealthDetection(): LabEvent[] {
     { id: "s3", title: "Acción segura", detail: "El nodo de laboratorio queda aislado; se preserva el registro para análisis.", severity: "success" }
   ];
 }
+
+export type LabSensor = "camera" | "microphone" | "motion";
+export function simulateSensorConsent(sensor: LabSensor, approved: boolean): LabEvent[] {
+  const label = sensor === "camera" ? "cámara" : sensor === "microphone" ? "micrófono" : "movimiento";
+  return approved
+    ? [{ id: "consent-" + sensor, title: "Permiso ficticio concedido", detail: "El escenario muestra telemetría sintética de " + label + "; no se accedió a ningún sensor real.", severity: "info" }]
+    : [{ id: "denied-" + sensor, title: "Permiso ficticio denegado", detail: "La simulación continúa sin telemetría de " + label + "; ningún sensor real fue solicitado o activado.", severity: "success" }];
+}
+export function simulateEmergencyShutdown(): LabEvent[] {
+  return [
+    { id: "shutdown-1", title: "Parada de emergencia", detail: "Se detuvo la actividad del nodo virtual y se revocaron sus acciones simuladas.", severity: "warning" },
+    { id: "shutdown-2", title: "Estado efímero eliminado", detail: "Se limpió únicamente la memoria del escenario; no se modificaron archivos ni dispositivos reales.", severity: "success" },
+    { id: "shutdown-3", title: "Auditoría preservada", detail: "Los eventos de seguridad permanecen disponibles para análisis académico.", severity: "success" }
+  ];
+}
