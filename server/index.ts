@@ -20,13 +20,13 @@ app.use(cors({
   allowedHeaders: ["Content-Type"]
 }));
 app.use(express.json({ limit: "64kb" }));
-app.use("/api/devices", deviceHub);
 app.use("/api", rateLimit({
   windowMs: 60_000,
   limit: 30,
   standardHeaders: "draft-7",
   legacyHeaders: false
 }));
+app.use("/api/devices", deviceHub);
 
 app.get("/api/health", (_req, res) => {
   res.setHeader("Cache-Control", "no-store");
