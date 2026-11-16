@@ -51,6 +51,7 @@ export default function App() {
   const [auditLog, setAuditLog] = useState<string[]>([]);
   const [sensorEvents, setSensorEvents] = useState<LabEvent[]>([]);
   const [showLabCode, setShowLabCode] = useState(false);
+  const [autoRunLab, setAutoRunLab] = useState(false);
   const [messages, setMessages] = useState<string[]>(["Hola. Soy LOW. Mi interfaz principal está lista; conecta un proveedor de modelos desde la configuración del servidor para habilitar respuestas inteligentes."]);
 
   useEffect(() => {
@@ -59,6 +60,22 @@ export default function App() {
     window.addEventListener("offline", update);
     return () => { window.removeEventListener("online", update); window.removeEventListener("offline", update); };
   }, []);
+  useEffect(() => {
+    if (!autoRunLab) return;
+    const timer = window.setInterval(() => {
+      setExecutionIndex((current) => {
+        if (current >= executionTrace.length - 1) {
+          setAutoRunLab(false);
+          return current;
+        }
+        const next = current + 1;
+        setExecutionTrace((steps) => steps.map((step, index) => ({ ...step, status: index <= next ? "completed" : "planned" })));
+        setAuditLog((log) => [...log, new Date().toLocaleTimeString("es-MX") + " · Ejecución en directo: paso " + (next + 1)]);
+        return next;
+      });
+    }, 900);
+    return () => window.clearInterval(timer);
+  }, [autoRunLab, executionTrace.length]);
 
   async function runNetworkCheck() {
     setNetworkBusy(true);
@@ -137,9 +154,9 @@ export default function App() {
                 <option value="home">Red doméstica</option><option value="office">Oficina segmentada</option><option value="guest">Red de invitados</option>
               </select>
               <div className="lab-actions">
-                <button className="primary" onClick={() => { const scenario = buildWifiScenario(wifiProfile); setWifiScenario(scenario); setExecutionTrace(buildWifiExecutionTrace(wifiProfile)); setExecutionIndex(0); setDefenseEvents([]); setSensorEvents([]); setShowLabCode(false); setAuditLog((log) => [...log, new Date().toLocaleTimeString("es-MX") + " · Inició simulación " + scenario.ssid]); }}>Crear y ejecutar laboratorio</button>
+                <button className="primary" onClick={() => { const scenario = buildWifiScenario(wifiProfile); setWifiScenario(scenario); setExecutionTrace(buildWifiExecutionTrace(wifiProfile)); setExecutionIndex(0); setAutoRunLab(false); setDefenseEvents([]); setSensorEvents([]); setShowLabCode(false); setAuditLog((log) => [...log, new Date().toLocaleTimeString("es-MX") + " · Inició simulación " + scenario.ssid]); }}>Crear y ejecutar laboratorio</button>
                 <button className="secondary" onClick={() => { const events = simulateStealthDetection(); setDefenseEvents(events); setAuditLog((log) => [...log, new Date().toLocaleTimeString("es-MX") + " · Se detectó y aisló un nodo ficticio; auditoría preservada"]); }}>Simular evasión y detección</button>
-                <button className="secondary" onClick={() => { setWifiScenario(null); setExecutionTrace([]); setExecutionIndex(-1); setDefenseEvents([]); setSensorEvents([]); setShowLabCode(false); setAuditLog((log) => [...log, new Date().toLocaleTimeString("es-MX") + " · Laboratorio detenido; estado efímero limpiado, auditoría conservada"]); }}>Detener y limpiar laboratorio</button>
+                <button className="secondary" onClick={() => { setWifiScenario(null); setExecutionTrace([]); setExecutionIndex(-1); setAutoRunLab(false); setDefenseEvents([]); setSensorEvents([]); setShowLabCode(false); setAuditLog((log) => [...log, new Date().toLocaleTimeString("es-MX") + " · Laboratorio detenido; estado efímero limpiado, auditoría conservada"]); }}>Detener y limpiar laboratorio</button>
               </div>
               {wifiScenario && <div className="wifi-sim-results">
                 <div className="validation ok"><b>{wifiScenario.ssid}</b><small>{wifiScenario.boundary}</small></div>
@@ -148,6 +165,7 @@ export default function App() {
                 <h3>Proceso de LOW · paso a paso</h3>
                 <div className="execution-list">{executionTrace.map((step, index) => <div className={"execution-step " + (index < executionIndex ? "done" : index === executionIndex ? "current" : "")} key={step.id}><span>{index < executionIndex ? "✓" : index + 1}</span><div><b>{step.phase} · {step.action}</b><small>{step.output}</small></div><em>{index < executionIndex ? "COMPLETADO" : index === executionIndex ? "EN CURSO" : "PENDIENTE"}</em></div>)}</div>
                 <button className="primary" disabled={executionIndex >= executionTrace.length - 1} onClick={() => { const next = Math.min(executionIndex + 1, executionTrace.length - 1); setExecutionIndex(next); setExecutionTrace((steps) => steps.map((step, index) => ({ ...step, status: index <= next ? "completed" : "planned" }))); setAuditLog((log) => [...log, new Date().toLocaleTimeString("es-MX") + " · Paso " + (next + 1) + " completado"]); }}>{executionIndex >= executionTrace.length - 1 ? "Proceso completado" : "Ejecutar siguiente paso"}</button>
+                <button className="secondary" disabled={executionIndex >= executionTrace.length - 1} onClick={() => setAutoRunLab((running) => !running)}>{autoRunLab ? "Pausar ejecución en directo" : "Ejecutar proceso en directo"}</button>
                 <h3>Eventos sintéticos de la red</h3>
                 <div className="execution-list">{wifiScenario.events.map((event) => <div className="execution-step" key={event.id}><span>•</span><div><b>{event.title}</b><small>{event.detail}</small></div><em>{event.severity.toUpperCase()}</em></div>)}</div>
               </div>}
@@ -163,7 +181,7 @@ export default function App() {
               </div>
               <div className="lab-actions">
                 <button className="secondary" onClick={() => setShowLabCode((value) => !value)}>{showLabCode ? "Ocultar" : "Ver"} datos y estructura del escenario</button>
-                <button className="secondary" onClick={() => { const events = simulateEmergencyShutdown(); setDefenseEvents((current) => [...current, ...events]); setWifiScenario(null); setExecutionTrace([]); setExecutionIndex(-1); setSensorEvents([]); setAuditLog((log) => [...log, new Date().toLocaleTimeString("es-MX") + " · Parada de emergencia virtual; memoria efímera limpiada y auditoría preservada"]); }}>Parada de emergencia del nodo virtual</button>
+                <button className="secondary" onClick={() => { const events = simulateEmergencyShutdown(); setDefenseEvents((current) => [...current, ...events]); setWifiScenario(null); setExecutionTrace([]); setExecutionIndex(-1); setAutoRunLab(false); setSensorEvents([]); setAuditLog((log) => [...log, new Date().toLocaleTimeString("es-MX") + " · Parada de emergencia virtual; memoria efímera limpiada y auditoría preservada"]); }}>Parada de emergencia del nodo virtual</button>
               </div>
               {showLabCode && wifiScenario && <pre className="lab-code"><code>{JSON.stringify({ scenario: wifiScenario, execution: executionTrace, note: "Datos ficticios locales; no representan dispositivos ni tráfico real." }, null, 2)}</code></pre>}
               {executionIndex >= executionTrace.length - 1 && executionTrace.length > 0 && <div className="validation ok"><b>Simulación terminada.</b><small>Siguientes acciones: cambiar de escenario, probar permisos simulados, activar la detección defensiva o revisar los datos del laboratorio.</small></div>}
