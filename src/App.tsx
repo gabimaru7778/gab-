@@ -236,7 +236,7 @@ export default function App() {
         let mediaUrl = r.data.mediaUrl || r.data.imageUrl || '';
         let mediaStatus = r.data.status || 'completed';
         if (r.data.jobId && r.data.accessToken) {
-          for (let attempt = 0; attempt < 45; attempt++) {
+          for (let attempt = 0; attempt < 90; attempt++) {
             await new Promise(resolve => setTimeout(resolve, 2000));
             const poll = await api.get('/api/guest/media/' + encodeURIComponent(r.data.jobId) + '?token=' + encodeURIComponent(r.data.accessToken));
             mediaStatus = poll.data.status || 'processing';
@@ -249,12 +249,12 @@ export default function App() {
       } else if (mode === 'Investigación') {
         const r = await api.post('/api/guest/research', { query: q });
         const sourceText = Array.isArray(r.data.sources) && r.data.sources.length
-          ? '\\n\\nFuentes consultadas:\\n' + r.data.sources.map((s: { title?: string; url: string; snippet?: string }) => '- ' + (s.title || s.url) + ' — ' + s.url + (s.snippet ? '\\n  ' + s.snippet : '')).join('\\n')
+          ? '\n\nFuentes consultadas:\n' + r.data.sources.map((s: { title?: string; url: string; snippet?: string }) => '- ' + (s.title || s.url) + ' — ' + s.url + (s.snippet ? '\n  ' + s.snippet : '')).join('\n')
           : '';
         setMessages(v => [...v, { id: crypto.randomUUID(), role: 'assistant', content: (r.data.answer || 'Resultados de búsqueda:') + sourceText }]);
       } else if (mode === 'Agente' || mode === 'Matemáticas') {
         const r = await api.post('/api/guest/agent', { goal: q, mode });
-        const sourceText = Array.isArray(r.data.sources) && r.data.sources.length ? '\\n\\nFuentes consultadas:\\n' + r.data.sources.map((s: { title?: string; url: string }) => '- ' + (s.title || s.url) + ' — ' + s.url).join('\\n') : '';
+        const sourceText = Array.isArray(r.data.sources) && r.data.sources.length ? '\n\nFuentes consultadas:\n' + r.data.sources.map((s: { title?: string; url: string }) => '- ' + (s.title || s.url) + ' — ' + s.url).join('\n') : '';
         setMessages(v => [...v, { id: crypto.randomUUID(), role: 'assistant', content: (r.data.reply || 'Tarea completada.') + sourceText }]);
       } else {
         const r = await api.post('/api/guest/chat', {
