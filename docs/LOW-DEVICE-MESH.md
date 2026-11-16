@@ -20,4 +20,7 @@ La orden de usuario es única: **«LOW, conecta este dispositivo»**. LOW identi
 - iOS: QR/deep link y APIs públicas de Apple; no prometer descubrimiento Bluetooth o control de otros equipos que iOS no exponga a una app normal.
 
 ## Estado honesto
-La base actual detecta plataforma/capacidades del navegador y selecciona una estrategia recomendada. La sesión real entre dispositivos todavía necesita LOW Sync desplegado, flujo de aprobación, almacenamiento seguro de claves y agentes complementarios para escritorio/otros móviles. No se presenta una recomendación como conexión ya establecida.
+La base actual detecta plataforma/capacidades del navegador y selecciona una estrategia recomendada, distinguiendo `capabilityDetected` de `available`. Todos los transportes permanecen como no disponibles hasta integrar sus componentes reales. La sesión real necesita LOW Sync, flujo de aprobación, almacenamiento seguro de claves y agentes complementarios. No se presenta una recomendación como conexión ya establecida.
+
+## Estado Android verificado
+La compilación de depuración de Capacitor 8 se completó correctamente en GitHub Actions el 16-11-2026. Es un APK de prueba; no se ha instalado en hardware real ni firmado como release. Android Companion Device Manager puede ayudar con el emparejamiento inicial, pero no crea por sí mismo el canal de datos; la app debe establecerlo después. Las tareas en segundo plano deben respetar los servicios y restricciones de Android.
