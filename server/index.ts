@@ -5,6 +5,7 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import path from "node:path";
 import { isAllowedOrigin, parseAllowedOrigins } from "./security";
+import { deviceHub } from "./device-hub";
 
 const app = express();
 const port = Number(process.env.PORT || 3001);
@@ -15,10 +16,11 @@ app.disable("x-powered-by");
 app.use(helmet({ contentSecurityPolicy: isProduction ? undefined : false, crossOriginEmbedderPolicy: false }));
 app.use(cors({
   origin: (origin, callback) => callback(null, isAllowedOrigin(origin, allowedOrigins)),
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "DELETE"],
   allowedHeaders: ["Content-Type"]
 }));
 app.use(express.json({ limit: "64kb" }));
+app.use("/api/devices", deviceHub);
 app.use("/api", rateLimit({
   windowMs: 60_000,
   limit: 30,
