@@ -14,7 +14,7 @@ LOW is a modular personal AI workspace, not a login-page project or a single-pur
 
 ## Run
 
-- Node.js 20+
+- Node.js 22+
 - `npm install`
 - `npm run dev`
 
@@ -22,7 +22,7 @@ The frontend runs on Vite and proxies `/api` to Express on port 3001.
 
 ## Configuration
 
-Provider credentials belong in the hosting environment, never in the browser or repository. The foundation detects whether GLM/OpenAI/Anthropic credentials exist, but provider adapters and model calls are not marked connected until their official endpoints and account access are tested.
+Provider credentials belong in the hosting environment, never in the browser or repository. No live model adapter is connected in this foundation. For Android, set the repository Actions variable `LOW_API_URL` to the public HTTPS origin of the deployed LOW API before building; without it the APK can open its local interface but cannot reach a remote API.
 
 ## Roadmap modules
 
@@ -31,7 +31,8 @@ LOW CORE, ROUTER, MEMORY, RESEARCH, DEVELOPER, AGENTS, CREATOR, VOICE, WORK, CON
 ## Honest capability status
 
 - Implemented: responsive shell, navigation, local JSON/CSV validation, browser online state, LOW API health check.
-- Not connected: live AI providers, GitHub App/OAuth inside LOW, agent runtime, persistent cloud jobs, private memory sync, voice, media generation and native Android APK.
+- Not connected: live AI providers, GitHub App/OAuth inside LOW, agent runtime, persistent cloud jobs, private memory sync, voice, media generation and native device pairing.
+- Android: a debug APK artifact was built by GitHub Actions. It is a test build, not a signed release; install and hardware compatibility have not been tested here.
 - Planned: Capacitor Android project and CI APK artifact after the mobile build configuration is verified.
 
 This is a foundation build, not a production-ready release. Run CI and test the deployment on actual target devices before treating integrations as operational.
