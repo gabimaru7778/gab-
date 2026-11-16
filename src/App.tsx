@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { validateCsv, validateJson } from "./lib/validators";
 import { detectDeviceCapabilities, describeConnectionCommand, recommendTransports } from "./lib/device-link";
+import { simulateAuthLab, type AuthLabMode, type AuthLabResult } from "./lib/academy-lab";
 import {
   Activity, ArrowUpRight, AudioLines, Bot, CheckCircle2, ChevronRight,
   Code2, Cpu, Database, FileCheck2, FileJson, FileText, Globe2,
@@ -9,7 +10,7 @@ import {
   Sparkles, Wifi, X, Zap
 } from "lucide-react";
 
-type Section = "overview" | "assistant" | "network" | "devices" | "data" | "developer" | "agents" | "creator" | "settings";
+type Section = "overview" | "assistant" | "network" | "devices" | "data" | "developer" | "agents" | "creator" | "lab" | "settings";
 type NetworkResult = { online: boolean; latencyMs: number | null; checkedAt: string; api: string };
 type ValidationResult = { valid: boolean; message: string; details: string[] };
 
@@ -19,7 +20,8 @@ const modules = [
   { id: "developer", title: "DEVELOPER", desc: "GitHub, repositorios, PR y Actions", icon: Github, status: "POR CONECTAR" },
   { id: "network", title: "NETWORK", desc: "Conectividad y diagnóstico de red", icon: Network, status: "DIAGNÓSTICO LOCAL" },
   { id: "data", title: "DATA", desc: "Validación y calidad de datos", icon: Database, status: "HERRAMIENTA LOCAL" },
-  { id: "creator", title: "CREATOR", desc: "Imagen, audio, vídeo y documentos", icon: Image, status: "POR CONECTAR" }
+  { id: "creator", title: "CREATOR", desc: "Imagen, audio, vídeo y documentos", icon: Image, status: "POR CONECTAR" },
+  { id: "lab", title: "ACADEMY LAB", desc: "Simulaciones académicas aisladas y reproducibles", icon: ShieldCheck, status: "SIMULACIÓN LOCAL" }
 ] as const;
 
 export default function App() {
@@ -36,6 +38,10 @@ export default function App() {
   const [validation, setValidation] = useState<ValidationResult | null>(null);
   const [csvValidation, setCsvValidation] = useState<ValidationResult | null>(null);
   const [message, setMessage] = useState("");
+  const [labMode, setLabMode] = useState<AuthLabMode>("parameterized");
+  const [labUser, setLabUser] = useState("ana");
+  const [labPassword, setLabPassword] = useState("demo-123");
+  const [labResult, setLabResult] = useState<AuthLabResult | null>(null);
   const [messages, setMessages] = useState<string[]>(["Hola. Soy LOW. Mi interfaz principal está lista; conecta un proveedor de modelos desde la configuración del servidor para habilitar respuestas inteligentes."]);
 
   useEffect(() => {
@@ -75,14 +81,14 @@ export default function App() {
   const currentTitle = useMemo(() => ({
     overview: "Centro de mando", assistant: "LOW CORE", network: "Diagnóstico de red", devices: "Conectar dispositivos",
     data: "Validación de datos", developer: "GitHub Developer", agents: "Agentes y trabajos",
-    creator: "Centro creativo", settings: "Configuración"
+    creator: "Centro creativo", lab: "Laboratorio académico", settings: "Configuración"
   } as Record<Section, string>)[section], [section]);
 
   const nav = [
     ["overview", "Centro de mando", Activity], ["assistant", "LOW CORE", Bot],
     ["agents", "Agentes", Layers3], ["developer", "GitHub", Github],
     ["network", "Redes", Network], ["devices", "Dispositivos", RadioTower], ["data", "Datos", Database],
-    ["creator", "Creator", Sparkles], ["settings", "Configuración", Settings2]
+    ["creator", "Creator", Sparkles], ["lab", "Academy Lab", ShieldCheck], ["settings", "Configuración", Settings2]
   ] as const;
 
   function go(target: Section) { setSection(target); setMenuOpen(false); }
@@ -113,6 +119,7 @@ export default function App() {
           {section === "developer" && <section className="tool-page"><div className="eyebrow">LOW DEVELOPER / GITHUB</div><h1>Tu centro de desarrollo</h1><p className="lead">Conecta GitHub para administrar repositorios, ramas, código, pull requests, incidencias y Actions.</p><div className="integration-card"><Github size={34}/><div><b>GitHub</b><span>Integración no conectada</span><p>El conector de esta sesión puede revisar el repositorio, pero LOW necesita su propia GitHub App u OAuth y permisos limitados para operar por cuenta propia.</p></div><span className="pending">PENDIENTE</span></div><div className="module-grid compact-grid"><div className="module-card static"><Code2/><h3>Repositorios y código</h3><p>Lectura, ramas, commits y cambios propuestos.</p></div><div className="module-card static"><CheckCircle2/><h3>Pull requests</h3><p>Revisión, comparaciones y creación con aprobación.</p></div><div className="module-card static"><Zap/><h3>Actions y seguridad</h3><p>Estado de CI, Dependabot y alertas autorizadas.</p></div></div></section>}
           {section === "agents" && <section className="tool-page"><div className="eyebrow">LOW AGENTS / ORQUESTACIÓN</div><h1>Agentes y trabajos</h1><p className="lead">Un espacio para planificar tareas, delegarlas a agentes especializados y seguir trabajos persistentes.</p><div className="module-grid compact-grid">{[["RESEARCH","Investigación y síntesis",Search],["DEVELOPER","Programación y pruebas",Code2],["SHIELD","Revisión defensiva",ShieldCheck],["CREATOR","Contenido multimodal",Sparkles]].map(([name, desc, Icon]) => { const I = Icon as typeof Bot; return <div className="module-card static" key={name as string}><I/><h3>{name as string}</h3><p>{desc as string}</p><span className="pending">MOTOR PENDIENTE</span></div>; })}</div><div className="notice"><Activity size={17}/><p>La cola persistente, reintentos, cancelación y ejecución en la nube todavía no están conectados. No se simulan trabajos completados.</p></div></section>}
           {section === "creator" && <section className="tool-page"><div className="eyebrow">LOW CREATOR / MULTIMEDIA</div><h1>Centro creativo</h1><p className="lead">Un único espacio para crear texto, imágenes, audio, música, vídeo y documentos mediante proveedores compatibles.</p><div className="module-grid compact-grid">{[["Imagen",Image],["Voz",Mic2],["Audio",AudioLines],["Documentos",FileText],["Vídeo",ScanLine],["Almacenamiento",HardDrive]].map(([name, Icon]) => { const I = Icon as typeof Image; return <div className="module-card static" key={name as string}><I/><h3>{name as string}</h3><p>Proveedor por conectar.</p><span className="pending">PENDIENTE</span></div>; })}</div></section>}
+          {section === "lab" && <section className="tool-page"><div className="eyebrow">LOW ACADEMY / LABORATORIO AISLADO</div><h1>Aprende en un entorno controlado</h1><p className="lead">Simulador local de autenticación para estudiar por qué concatenar entradas en SQL es inseguro y cómo los parámetros separados evitan que los datos cambien la consulta.</p><div className="lab-card"><div className="lab-top"><div><b>Laboratorio 01 · Autenticación SQL</b><small>Dataset ficticio · Sin base de datos · Sin red · Sin sistemas externos</small></div><span className="pending">SOLO SIMULACIÓN</span></div><div className="lab-modes"><button className={labMode === "vulnerable" ? "mode active" : "mode"} onClick={() => {setLabMode("vulnerable");setLabResult(null);}}>Consulta concatenada</button><button className={labMode === "parameterized" ? "mode active" : "mode"} onClick={() => {setLabMode("parameterized");setLabResult(null);}}>Consulta parametrizada</button></div><label>Usuario de demostración</label><input value={labUser} onChange={(e) => setLabUser(e.target.value)} maxLength={100}/><label>Contraseña de demostración</label><input type="text" value={labPassword} onChange={(e) => setLabPassword(e.target.value)} maxLength={100}/><div className="lab-actions"><button className="secondary" onClick={() => {setLabUser("' OR '1'='1");setLabPassword("x");setLabResult(null);}}>Cargar ejemplo educativo</button><button className="primary" onClick={() => setLabResult(simulateAuthLab(labUser, labPassword, labMode))}>Ejecutar simulación</button></div>{labResult && <div className={"lab-result " + (labResult.authenticated ? "ok" : "fail")}><b>{labResult.authenticated ? "Acceso simulado concedido" : "Acceso simulado denegado"}</b><small>{labResult.account ? "Cuenta: " + labResult.account + " · Rol: " + labResult.role : "Sin identidad autenticada"}</small><p>{labResult.explanation}</p><code>{labResult.queryPreview}</code></div>}</div><div className="notice"><ShieldCheck size={17}/><p>Este laboratorio solo evalúa una regla de demostración en memoria. No ejecuta consultas SQL, no contiene cuentas reales y no envía datos a la red. Úsalo para comparar el comportamiento vulnerable con el enfoque parametrizado.</p></div></section>}
           {section === "settings" && <section className="tool-page"><div className="eyebrow">LOW SHIELD / CONFIGURACIÓN</div><h1>Configuración del sistema</h1><p className="lead">Los proveedores se configuran en el servidor para mantener las credenciales fuera del cliente.</p><div className="settings-list"><div><RadioTower/><span><b>LOW Connect</b><small>Selector adaptable QR, LAN, Bluetooth o relay seguro; sincronización real pendiente de LOW Sync.</small></span><em>PREPARACIÓN</em></div><div><Cpu/><span><b>Proveedor de modelos</b><small>GLM preferido cuando endpoint y acceso estén verificados.</small></span><em>NO CONECTADO</em></div><div><Github/><span><b>GitHub App / OAuth</b><small>Permisos mínimos y confirmación para operaciones de escritura.</small></span><em>NO CONECTADO</em></div><div><ShieldCheck/><span><b>Seguridad</b><small>Sin secretos en el navegador. Acciones externas requieren aprobación.</small></span><em>BASE LOCAL</em></div><div><Globe2/><span><b>Multidispositivo</b><small>Web adaptable ahora; Android APK y funciones nativas por implementar.</small></span><em>EN PLAN</em></div></div></section>}
           <footer className="footer"><span>LOW · PERSONAL INTELLIGENCE</span><span>FOUNDATION BUILD 0.1.0</span></footer>
         </div>
