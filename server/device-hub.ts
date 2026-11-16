@@ -3,7 +3,7 @@ import { Router, type Request, type Response } from "express";
 
 type Telemetry = { batteryPercent?: number | null; appState?: "foreground" | "background" | "idle"; network?: "online" | "offline"; lastSeen: number };
 type Device = { id: string; name: string; tokenHash: string; linkId: string; telemetry: Telemetry; revoked: boolean };
-type Pairing = { id: string; codeHash: string; ownerSecretHash: string; claimSecretHash?: string; ownerName: string; claimantName?: string; expiresAt: number; state: "pending" | "claimed" | "approved" | "rejected"; ownerDeviceId?: string; claimantDeviceId?: string; ownerToken?: string; claimantToken?: string };
+type Pairing = { id: string; codeHash: string; ownerSecretHash: string; claimSecretHash?: string; ownerName: string; claimantName?: string; expiresAt: number; state: "pending" | "claimed" | "approved" | "rejected"; ownerDeviceId?: string; claimantDeviceId?: string; claimantToken?: string };
 const pairings = new Map<string, Pairing>();
 const devices = new Map<string, Device>();
 const hash = (value: string) => createHash("sha256").update(value).digest("hex");
@@ -54,7 +54,7 @@ deviceHub.post("/pairings/:id/approve", (req, res) => {
   devices.set(ownerId, { id: ownerId, name: pair.ownerName, tokenHash: hash(ownerToken), linkId, telemetry: initial, revoked: false });
   devices.set(claimantId, { id: claimantId, name: pair.claimantName || "Dispositivo", tokenHash: hash(claimantToken), linkId, telemetry: initial, revoked: false });
   pair.state = "approved"; pair.ownerDeviceId = ownerId; pair.claimantDeviceId = claimantId;
-  pair.ownerToken = ownerToken; pair.claimantToken = claimantToken;
+  pair.claimantToken = claimantToken;
   res.setHeader("Cache-Control", "no-store");
   return res.json({ state: "approved", deviceId: ownerId, accessToken: ownerToken, linkedDevice: pair.claimantName });
 });
