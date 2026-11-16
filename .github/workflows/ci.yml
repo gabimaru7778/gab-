@@ -1,7 +1,7 @@
-name: Cyber Lab CI
+name: LOW CI
 on:
   push:
-    branches: ["main", "feature/gpt-6-cyber-lab"]
+    branches: ["main", "feature/low-operating-system"]
   pull_request:
     branches: ["main"]
 permissions:
@@ -15,4 +15,5 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - run: npm run typecheck
       - run: npm run build
