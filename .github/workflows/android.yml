@@ -28,7 +28,7 @@ jobs:
         with:
           packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
       - run: npm install
-      - run: npm run build
+      - name: Build web assets for Android\n        run: npm run build\n        env:\n          VITE_LOW_API_URL: ${{ vars.LOW_API_URL }}
       - run: npx cap add android
       - run: npx cap sync android
       - name: Build debug APK
