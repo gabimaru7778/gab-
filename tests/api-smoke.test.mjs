@@ -27,7 +27,7 @@ test('registration creates a session and isolates vault records',async()=>{
  assert.equal(save.status,201);
  const saved=await save.json();assert.ok(saved.record?.id);assert.equal(saved.record.title,'test');
  const listed=await fetch(base+'/api/vault',{headers:{cookie}});const records=(await listed.json()).records;
- assert.equal(records.length,1);assert.equal(records[0].id,saved.record.id);assert.equal(records[0].ciphertext,'ciphertext');
+ assert.equal(records.length,1);assert.equal(records[0].id,saved.record.id);assert.equal(records[0].ciphertext,'Y2lwaGVydGV4dA==');
  const other=await fetch(base+'/api/auth/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:'other-'+Date.now()+'@example.test',name:'Other User',password:'another long test password'})});
  const otherCookie=(other.headers.get('set-cookie')||'').split(';')[0];const otherVault=await fetch(base+'/api/vault',{headers:{cookie:otherCookie}});
  assert.deepEqual((await otherVault.json()).records,[]);
