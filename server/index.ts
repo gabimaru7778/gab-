@@ -4,15 +4,17 @@ import helmet from "helmet";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import path from "node:path";
+import { isAllowedOrigin, parseAllowedOrigins } from "./security";
 
 const app = express();
 const port = Number(process.env.PORT || 3001);
 const isProduction = process.env.NODE_ENV === "production";
+const allowedOrigins = parseAllowedOrigins(process.env.APP_ORIGINS, !isProduction);
 
 app.disable("x-powered-by");
 app.use(helmet({ contentSecurityPolicy: isProduction ? undefined : false, crossOriginEmbedderPolicy: false }));
 app.use(cors({
-  origin: process.env.APP_ORIGIN || (isProduction ? false : "http://localhost:5173"),
+  origin: (origin, callback) => callback(null, isAllowedOrigin(origin, allowedOrigins)),
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type"]
 }));
