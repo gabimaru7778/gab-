@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { auth, api } from './lib/client';
 import type { AuthUser } from './lib/client';
 import {
@@ -15,6 +15,8 @@ import {
   KeyRound,
   LockKeyhole,
   LogOut,
+  Mic,
+  Volume2,
   Menu,
   Plus,
   ScanSearch,
@@ -166,6 +168,8 @@ export default function App() {
     [scanResult, setScanResult] = useState(''),
     [scanBusy, setScanBusy] = useState(false);
   const [toast, setToast] = useState('');
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const [learningReport, setLearningReport] = useState('');
   const [learningAt, setLearningAt] = useState('');
   const [higgsfieldConfigured, setHiggsfieldConfigured] = useState(false);
@@ -327,6 +331,49 @@ export default function App() {
       setErr(e instanceof Error ? e.message : 'No se pudo crear la clave.');
     }
   }
+  function startVoiceInput() {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setErr('Este navegador no ofrece dictado por voz. Puedes seguir escribiendo normalmente.');
+      return;
+    }
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'es-MX';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results || []).map((item: any) => item[0]?.transcript || '').join(' ').trim();
+        if (transcript) setInput(current => current ? current + ' ' + transcript : transcript);
+      };
+      recognition.onerror = () => setErr('No se pudo reconocer el audio. Revisa el permiso del micrófono e inténtalo de nuevo.');
+      recognition.onend = () => setListening(false);
+      recognitionRef.current = recognition;
+      setListening(true);
+      recognition.start();
+    } catch {
+      setListening(false);
+      setErr('No se pudo iniciar el micrófono.');
+    }
+  }
+  function stopVoiceInput() {
+    recognitionRef.current?.stop?.();
+    setListening(false);
+  }
+  function speakText(value: string) {
+    if (!('speechSynthesis' in window)) {
+      setErr('La lectura en voz alta no está disponible en este navegador.');
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(value);
+    utterance.lang = 'es-MX';
+    window.speechSynthesis.speak(utterance);
+  }
+  useEffect(() => () => {
+    recognitionRef.current?.stop?.();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  }, []);
   async function runScan() {
     if (!user) {
       setErr('Inicia sesión para utilizar Cyber Lab. El resto de LOW sigue disponible sin cuenta.');
@@ -484,6 +531,7 @@ export default function App() {
                   <article key={m.id} className={'msg ' + m.role}>
                     <b>{m.role === 'assistant' ? 'LOW' : 'TÚ'}</b>
                     {m.content && <p>{m.content}</p>}
+                    {m.role === 'assistant' && m.content && <button className="voiceRead" type="button" aria-label="Leer respuesta en voz alta" onClick={() => speakText(m.content)}><Volume2 size={15} /> Escuchar</button>}
                     {m.mediaUrl && m.mediaType === 'video' && <video className="generatedImage" controls playsInline src={m.mediaUrl}>Tu navegador no puede reproducir este vídeo.</video>}
                     {(m.imageUrl || (m.mediaUrl && m.mediaType === 'image')) && <img className="generatedImage" src={m.mediaUrl || m.imageUrl} alt="Imagen generada por LOW" />}
                   </article>
@@ -511,6 +559,7 @@ export default function App() {
                 }}
                 placeholder={mode === 'Imagen' ? 'Describe la imagen que Higgsfield debe crear…' : mode === 'Video' ? 'Describe el vídeo que Higgsfield debe generar…' : mode === 'Agente' ? 'Asigna una misión; LOW planificará y usará herramientas seguras…' : 'Escribe lo que quieres explorar, aprender o crear…'}
               />
+              <button className="voiceInput" type="button" aria-label={listening ? 'Detener dictado' : 'Dictar mensaje'} title={listening ? 'Detener dictado' : 'Dictar mensaje'} onClick={listening ? stopVoiceInput : startVoiceInput}><Mic size={17} />{listening ? 'Detener' : 'Voz'}</button>
               <button disabled={!input.trim() || busy} onClick={send}>
                 <ArrowUp />
               </button>
