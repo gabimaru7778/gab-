@@ -1,43 +1,34 @@
-# LOW — especificación de control, redes, datos y Android
+# LOW — red, datos, integraciones y Android
 
-Estado: diseño técnico pendiente de implementación sobre el proyecto LOW real. La rama actual del repositorio contiene el Cyber Lab PWA, no el código completo de Replit.
+## Estado
 
-## 1. Panel LOW CONTROL
-- Inicio configurable con tarjetas de conexión, modelos, trabajos, notificaciones, estado de servicios, seguridad, almacenamiento y dispositivos.
-- Centro de comandos: cada acción explica qué hará, sobre qué recurso, con qué permisos y si modifica datos.
-- Historial auditable con usuario, fecha, alcance, resultado y botón de cancelación cuando sea posible.
-- Separar controles de lectura, acciones reversibles y acciones sensibles.
+Este documento describe el trabajo sobre la nueva base LOW. No depende de la página de login ni de una instancia anterior. Las capacidades se marcan como activas solo tras pruebas reproducibles.
 
-## 2. LOW NETWORK
-- Pruebas locales: conectividad, gateway/DNS si el SO lo expone, DNS lookup, HTTP/HTTPS, TLS, latencia y pérdida aproximada.
-- Pruebas de LAN propia: inventario acotado y chequeos no intrusivos solo tras elegir rango y confirmar propiedad/autorización.
-- Allowlist de destinos, límites de concurrencia, timeout, backoff y botón detener.
-- Sin escaneo de Internet, explotación, fuerza bruta, interceptación, captura de tráfico ni evasión.
-- En Android, declarar permisos mínimos y explicar su uso; las APIs de red y Wi-Fi cambian según versión y fabricante.
+## LOW CONTROL
+Panel modular con estado de servicios, modelos, agentes, trabajos, integraciones, alertas, dispositivos y aprobaciones. Diferenciar indicadores de solo lectura de acciones que modifican recursos.
 
-## 3. LOW DATA
-- Validadores para JSON, CSV, XML y formularios mediante esquemas configurables.
-- Tipos, requeridos, longitudes, rangos, fechas, patrones, duplicados y consistencia entre campos.
-- Informe con errores, advertencias y sugerencias; distinguir validación sintáctica de veracidad del dato.
-- Vista previa y exportación; no sobrescribir el original sin aprobación.
-- Redacción de PII, credenciales y tokens en logs.
+## LOW NETWORK
+- Comprobación de conectividad del dispositivo y disponibilidad de la API propia.
+- Diagnóstico adicional: DNS, TLS, HTTP, latencia y conectividad LAN propia, sujeto a APIs del sistema y permisos.
+- Allowlist, límites de concurrencia, timeout, cancelación y registro para toda prueba de red.
+- No escanear Internet ni redes de terceros; no explotación, fuerza bruta, interceptación o evasión.
 
-## 4. LOW ANDROID
-- Auditar el frontend y backend reales antes de elegir Capacitor o un wrapper nativo.
-- Reutilizar UI React cuando sea compatible; mantener las claves y la lógica privada en servidor.
-- Construir APK debug en CI para pruebas; firmar release con keystore guardado como secreto de CI.
-- Verificar firma, hash, permisos, actualizaciones y compatibilidad de Android.
-- Generar AAB solo si se decide publicar en Google Play.
-- Entregar APK mediante Releases/Artifacts; no afirmar que existe hasta que el pipeline lo produzca y se pruebe en un teléfono.
+## LOW DATA
+- JSON: sintaxis, tipos, campos requeridos y esquemas.
+- CSV: encabezados, duplicados, campos entrecomillados y consistencia de columnas.
+- XML/formularios: añadir validadores por esquema en una fase posterior.
+- Vista previa, reporte de errores/advertencias y operación no destructiva.
+- Los validadores locales no suben contenido a la API.
 
-## 5. Candidatos GitHub para evaluación
-- OpenCode: agente de codificación open source; evaluar servicio externo/aislado, provider adapters y modelo de permisos.
-- Everything Claude Code: evaluar skills, hooks, agentes, reglas y pruebas que puedan adaptarse; revisar licencia y dependencias antes de copiar o modificar.
-- GLM/Z.ai: verificar API oficial, identificadores de modelo, región, cuotas y credenciales. El nombre GLM-5.3 queda como preferencia, no como conexión confirmada.
-- GitHub Actions, Dependabot, secret scanning y CodeQL: integrar estados y alertas si la cuenta, el repositorio y el plan conceden permisos.
+## GitHub
+GitHub App/OAuth propio de LOW; permisos mínimos; tokens solo en backend. Lectura de repositorios, archivos, ramas, commits, PR, Issues, Actions y alertas disponibles. Las escrituras y ejecuciones requieren aprobación contextual.
 
-## 6. Seguridad de extensiones
-- Cada plugin/skill declara versión, licencia, origen, permisos, endpoints, datos que lee/escribe y mantenimiento.
-- Ejecutar herramientas externas aisladas del proceso web; validar entradas y salidas; denegar por defecto.
-- Prohibir secretos en el cliente y revisar dependencias con lockfile y escaneo.
-- Requerir aprobación antes de escribir repositorios, publicar, desplegar, escanear redes o cambiar configuraciones.
+## Modelos y agentes
+GLM-5.3 como preferencia solo tras verificar endpoint y acceso real. OpenCode y ECC son candidatos para integración modular; revisar licencias, seguridad de dependencias y aislamiento. No copiar componentes propietarios ni presentar servicios como conectados sin pruebas.
+
+## Android
+- Capacitor 8 como runtime candidato para empaquetar la interfaz React en Android.
+- Construcción debug APK mediante GitHub Actions, artefacto descargable y verificación de instalación.
+- Keystore de release protegido como secreto de CI; nunca subirlo al repositorio.
+- AAB solo para Google Play si se decide publicar.
+- Revisar permisos nativos y probar en teléfonos reales.
