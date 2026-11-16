@@ -397,6 +397,29 @@ button:disabled {
   display: grid;
   place-items: center;
 }
+.composer .voiceInput {
+  width: auto;
+  min-width: 66px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #282131;
+  border: 1px solid #55446c;
+  font-size: 11px;
+}
+.voiceRead {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #55446c;
+  border-radius: 8px;
+  background: #211b2b;
+  color: #cbb7f6;
+  padding: 6px 9px;
+  font-size: 11px;
+}
 .hint {
   margin: 10px 0 17px;
   color: #635d6d;
