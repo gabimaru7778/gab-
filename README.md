@@ -28,7 +28,7 @@ Vite: puerto 5173. API: puerto 3001. Compilar: `npm run build`.
 - WORK: agente textual; aún no ejecuta herramientas externas.
 - SHIELD: análisis defensivo del texto; no realiza escaneos ni conexiones a objetivos.
 - CONNECT: API key por usuario, endpoint Bearer `/v1/chat/completions`, listado de modelos y revocación de claves. Requiere configurar proveedor IA; sin CORS público para navegadores de terceros.
-- CREATOR: adaptador multimedia pendiente.
+- CREATOR: envío y consulta asíncrona de imágenes (Soul Standard) y vídeo (Seedance 2.0) con Higgsfield; requiere `HF_API_KEY_ID` y `HF_API_KEY_SECRET`, y una cuenta API con saldo. El modelo y la facturación API son independientes de la suscripción web.
 - VOICE: dictado iniciado por el usuario y lectura en voz alta mediante APIs del navegador; la disponibilidad depende de Safari/navegador y permisos del dispositivo. No hay escucha en segundo plano ni voz conversacional en streaming.
 - RESEARCH: adaptador de búsqueda web Tavily implementado; requiere `TAVILY_API_KEY` en el entorno del servidor. Sin esa clave, devuelve un error de configuración explícito.
 - DEVELOPER: ejecución aislada pendiente; no ejecuta código arbitrario.
