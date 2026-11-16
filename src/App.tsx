@@ -232,6 +232,7 @@ export default function App() {
       const wantsImage = mode === 'Imagen' || /\b(genera|crea|dibuja|diseña|ilustra|hazme|renderiza)\b.*\b(imagen|foto|ilustración|dibujo|logo|portada|ilustracion)\b/i.test(q);
       if (wantsImage || wantsVideo) {
         const kind = wantsVideo ? 'video' : 'image';
+        if (!user) throw new Error('Inicia sesión para usar CREATOR. La generación consume saldo de una cuenta API de Higgsfield.');
         const r = await api.post('/api/guest/media', { prompt: q, kind });
         let mediaUrl = r.data.mediaUrl || r.data.imageUrl || '';
         let mediaStatus = r.data.status || 'completed';
