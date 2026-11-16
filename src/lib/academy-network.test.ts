@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildWifiScenario, buildWifiExecutionTrace, simulateStealthDetection } from "./academy-network";
+import { buildWifiScenario, buildWifiExecutionTrace, simulateStealthDetection, simulateSensorConsent, simulateEmergencyShutdown } from "./academy-network";
 
 test("Wi-Fi scenarios are fictional and return isolated copies", () => {
   const first = buildWifiScenario("home");
@@ -21,4 +21,17 @@ test("stealth behavior is detected and isolated without deleting audit evidence"
   assert.equal(events.length, 3);
   assert.ok(events.some((event) => /aislado/i.test(event.detail)));
   assert.ok(events.some((event) => /registro/i.test(event.detail)));
+});
+
+test("sensor permissions are synthetic and never imply real sensor access", () => {
+  const approved = simulateSensorConsent("camera", true);
+  const denied = simulateSensorConsent("microphone", false);
+  assert.match(approved[0].detail, /no se accedió a ningún sensor real/i);
+  assert.match(denied[0].detail, /ningún sensor real fue solicitado/i);
+});
+test("emergency shutdown clears only virtual state and preserves audit", () => {
+  const events = simulateEmergencyShutdown();
+  assert.equal(events.length, 3);
+  assert.ok(events.some((event) => /estado efímero eliminado/i.test(event.detail)));
+  assert.ok(events.some((event) => /auditoría preservada/i.test(event.title)));
 });
