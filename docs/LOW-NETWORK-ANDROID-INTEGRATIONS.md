@@ -27,8 +27,11 @@ GitHub App/OAuth propio de LOW; permisos mínimos; tokens solo en backend. Lectu
 GLM-5.3 como preferencia solo tras verificar endpoint y acceso real. OpenCode y ECC son candidatos para integración modular; revisar licencias, seguridad de dependencias y aislamiento. No copiar componentes propietarios ni presentar servicios como conectados sin pruebas.
 
 ## Android
-- Capacitor 8 como runtime candidato para empaquetar la interfaz React en Android.
+- Capacitor 8 como runtime para empaquetar la interfaz React en Android (Android 7/API 24+ según la matriz de Capacitor 8).\n- La app nativa debe apuntar a `VITE_LOW_API_URL` (variable de repositorio `LOW_API_URL` en Actions); una ruta relativa desde el WebView no sustituye a un backend remoto.\n- Evitar fuentes web externas en el arranque; tipografía de sistema, carga diferida y assets locales.
 - Construcción debug APK mediante GitHub Actions, artefacto descargable y verificación de instalación.
 - Keystore de release protegido como secreto de CI; nunca subirlo al repositorio.
 - AAB solo para Google Play si se decide publicar.
 - Revisar permisos nativos y probar en teléfonos reales.
+
+## LOW CONNECT — dispositivos
+Consultar `docs/LOW-DEVICE-MESH.md`. La interfaz detecta capacidades y propone transporte; QR/LAN/Bluetooth/relay reales requieren servicio de emparejamiento, agente remoto y aprobación mutua. No etiquetar dispositivos como conectados hasta completar handshake autenticado.
