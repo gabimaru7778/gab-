@@ -10,7 +10,7 @@ const port = Number(process.env.PORT || 3001);
 const isProduction = process.env.NODE_ENV === "production";
 
 app.disable("x-powered-by");
-app.use(helmet({ crossOriginEmbedderPolicy: false }));
+app.use(helmet({ contentSecurityPolicy: isProduction ? undefined : false, crossOriginEmbedderPolicy: false }));
 app.use(cors({
   origin: process.env.APP_ORIGIN || (isProduction ? false : "http://localhost:5173"),
   methods: ["GET", "POST"],
