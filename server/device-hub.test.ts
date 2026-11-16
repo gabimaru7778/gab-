@@ -7,7 +7,7 @@ test("LOW Sync requires mutual approval and limits telemetry to an allowlist", a
   const app = express(); app.use(express.json()); app.use("/api/devices", deviceHub);
   const server = app.listen(0);
   await new Promise<void>((resolve) => server.once("listening", resolve));
-  t.after(() => server.close());
+  t.after(async () => { await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve())); });
   const address = server.address();
   assert.ok(address && typeof address === "object");
   const base = `http://127.0.0.1:${address.port}/api/devices`;
