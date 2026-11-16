@@ -25,5 +25,11 @@ test('registration creates a session and isolates vault records',async()=>{
  const vault=await fetch(base+'/api/vault',{headers:{cookie}});assert.equal(vault.status,200);assert.deepEqual((await vault.json()).records,[]);
  const save=await fetch(base+'/api/vault',{method:'POST',headers:{cookie,'content-type':'application/json'},body:JSON.stringify({title:'test',salt:'salt',iv:'iv',ciphertext:'ciphertext'})});
  assert.equal(save.status,201);
+ const saved=await save.json();assert.ok(saved.record?.id);assert.equal(saved.record.title,'Cifrado AES-GCM');
+ const listed=await fetch(base+'/api/vault',{headers:{cookie}});const records=(await listed.json()).records;
+ assert.equal(records.length,1);assert.equal(records[0].id,saved.record.id);assert.equal(records[0].ciphertext,'ciphertext');
+ const other=await fetch(base+'/api/auth/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:'other-'+Date.now()+'@example.test',name:'Other User',password:'another long test password'})});
+ const otherCookie=(other.headers.get('set-cookie')||'').split(';')[0];const otherVault=await fetch(base+'/api/vault',{headers:{cookie:otherCookie}});
+ assert.deepEqual((await otherVault.json()).records,[]);
 });
 test('private vault rejects anonymous requests',async()=>{const r=await fetch(base+'/api/vault');assert.equal(r.status,401);});
