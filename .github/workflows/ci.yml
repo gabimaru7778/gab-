@@ -4,6 +4,9 @@ on:
     branches: [main, low-github-native]
   pull_request:
     branches: [main]
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
