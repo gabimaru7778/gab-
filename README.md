@@ -30,7 +30,7 @@ Vite: puerto 5173. API: puerto 3001. Compilar: `npm run build`.
 - CONNECT: API key por usuario, endpoint Bearer `/v1/chat/completions`, listado de modelos y revocación de claves. Requiere configurar proveedor IA; sin CORS público para navegadores de terceros.
 - CREATOR: adaptador multimedia pendiente.
 - VOICE: dictado iniciado por el usuario y lectura en voz alta mediante APIs del navegador; la disponibilidad depende de Safari/navegador y permisos del dispositivo. No hay escucha en segundo plano ni voz conversacional en streaming.
-- RESEARCH: sin proveedor de búsqueda conectado; el modo actual no navega por la web.
+- RESEARCH: adaptador de búsqueda web Tavily implementado; requiere `TAVILY_API_KEY` en el entorno del servidor. Sin esa clave, devuelve un error de configuración explícito.
 - DEVELOPER: ejecución aislada pendiente; no ejecuta código arbitrario.
 - CLOUD: los registros cifrados se guardan en SQLite por cuenta, pero no hay sincronización de clientes/dispositivos ni backup automatizado.
 - LEARNING: la ruta de estado es un placeholder; no hay scheduler ni ciclos automáticos.
