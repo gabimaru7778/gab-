@@ -27,7 +27,7 @@ Vite: puerto 5173. API: puerto 3001. Compilar: `npm run build`.
 - MEMORY: bóveda cifrada en cliente, almacenada por usuario en SQLite.
 - WORK: agente textual; aún no ejecuta herramientas externas.
 - SHIELD: análisis defensivo del texto; no realiza escaneos ni conexiones a objetivos.
-- CONNECT: emisión básica de claves de usuario; todavía no es un API gateway completo.
+- CONNECT: API key por usuario, endpoint Bearer `/v1/chat/completions`, listado de modelos y revocación de claves. Requiere configurar proveedor IA; sin CORS público para navegadores de terceros.
 - CREATOR: adaptador multimedia pendiente.
 - VOICE: dictado iniciado por el usuario y lectura en voz alta mediante APIs del navegador; la disponibilidad depende de Safari/navegador y permisos del dispositivo. No hay escucha en segundo plano ni voz conversacional en streaming.
 - RESEARCH con navegación real, sincronización CLOUD multi-dispositivo, scheduler LEARNING, ejecución aislada DEVELOPER y conectores: pendientes.
