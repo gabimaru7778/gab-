@@ -32,4 +32,16 @@ test('registration creates a session and isolates vault records',async()=>{
  const otherCookie=(other.headers.get('set-cookie')||'').split(';')[0];const otherVault=await fetch(base+'/api/vault',{headers:{cookie:otherCookie}});
  assert.deepEqual((await otherVault.json()).records,[]);
 });
+test('API keys authenticate, expose models and can be revoked',async()=>{
+ const email='keys-'+Date.now()+'@example.test';
+ const login=await fetch(base+'/api/auth/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,name:'Key Test',password:'this is another long password'})});
+ const cookie=(login.headers.get('set-cookie')||'').split(';')[0];
+ const created=await fetch(base+'/api/keys',{method:'POST',headers:{cookie,'content-type':'application/json'},body:JSON.stringify({label:'test agent'})});
+ assert.equal(created.status,201);const value=(await created.json()).apiKey;assert.match(value,/^low_/);
+ const models=await fetch(base+'/v1/models',{headers:{authorization:'Bearer '+value}});assert.equal(models.status,200);assert.equal((await models.json()).data[0].id,'low-core');
+ const denied=await fetch(base+'/v1/models',{headers:{authorization:'Bearer low_invalid'}});assert.equal(denied.status,401);
+ const listed=await fetch(base+'/api/keys',{headers:{cookie}});const keyId=(await listed.json()).keys[0].id;
+ const revoked=await fetch(base+'/api/keys/'+keyId,{method:'DELETE',headers:{cookie}});assert.equal(revoked.status,200);
+ const after=await fetch(base+'/v1/models',{headers:{authorization:'Bearer '+value}});assert.equal(after.status,401);
+});
 test('private vault rejects anonymous requests',async()=>{const r=await fetch(base+'/api/vault');assert.equal(r.status,401);});
