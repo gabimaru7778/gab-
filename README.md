@@ -33,8 +33,9 @@ LOW CORE, ROUTER, MEMORY, RESEARCH, DEVELOPER, AGENTS, CREATOR, VOICE, WORK, CON
 ## Honest capability status
 
 - Implemented: responsive shell, navigation, local JSON/CSV validation, browser online state, LOW API health check.
-- Not connected: live AI providers, GitHub App/OAuth inside LOW, agent runtime, persistent cloud jobs, private memory sync, voice, media generation and native device pairing.
+- LOW Sync: consent-based code pairing, authenticated device tokens, heartbeat telemetry (app foreground/background + network state), linked-device status and bilateral revocation are implemented in the API/UI. Sessions are in-memory and disappear on server restart; deploy the API over HTTPS before testing across devices.
+- Not connected: live AI providers, GitHub App/OAuth inside LOW, agent runtime, persistent cloud jobs, private memory sync, voice, media generation and native Bluetooth/Companion Device Manager integration.
 - Android: Capacitor debug APK is produced by CI; it remains a test build and requires hardware QA and release signing.
-- Academy Network Lab: local-only simulation and transparent step trace implemented; real network discovery, remote device observation and native pairing are not implemented.
+- Remote device visibility is limited to explicit LOW app telemetry; no remote screen, file, location, camera, microphone or OS-level control is provided.
 
 This is a foundation build, not a production-ready release. Run CI and test the deployment on actual target devices before treating integrations as operational.
