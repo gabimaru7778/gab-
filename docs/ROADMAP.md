@@ -1,7 +1,7 @@
 # LOW migration roadmap
 
 ## Stage 0 — source preservation
-- [x] Initialize the private GitHub repository with architecture and migration principles.
+- [x] Use the single public GitHub repository with architecture and migration principles.
 - [ ] Import the exact deployed source snapshot from AppDeploy.
 - [ ] Compare imported files against the deployed snapshot and record its version.
 - [ ] Confirm no secrets, user data, generated tokens or deployment credentials enter Git.
@@ -10,7 +10,8 @@
 - [ ] Add lockfile and reproducible install/build scripts.
 - [ ] Add typecheck, lint and unit-test commands.
 - [ ] Add API contract tests for guest chat, media jobs, vault, API keys and security review.
-- [ ] Add CI checks for pull requests.
+- [x] Add CI checks for pushes and pull requests.
+- [x] Add daily scheduled CI and manual workflow dispatch.
 
 ## Stage 2 — backend modularization
 - [ ] Extract routes into domain modules.
@@ -52,11 +53,28 @@ The recovered AppDeploy snapshot is version `1794036989678`. It contains a React
 - [x] Add a first-party Node/Express API with SQLite, account sessions, chat/agent adapter, encrypted-vault persistence and defensive text review.
 - [x] Add basic in-memory API rate limits and configurable production origin allowlist.
 - [x] Add GitHub Actions CI; current verified run: typecheck, Vite build and tests succeeded before the rate-limit patch. A new run is checking the latest patch.
-- [ ] Add a committed npm lockfile and runtime API integration tests.
+- [ ] Add a committed npm lockfile (CI currently uses `npm install`).
+- [x] Add runtime API smoke tests for auth, vault persistence/isolation, API keys, SHIELD, Research and Creator provider readiness.
 - [ ] Complete CSRF strategy, durable rate limiting, account verification/recovery, backups and audit events.
-- [ ] Migrate real multimedia, voice, research browsing, tool execution and multi-device sync providers.
+- [x] Add real web-search adapter (Tavily; requires `TAVILY_API_KEY`).
+- [x] Add Higgsfield image/video job adapter (requires API key ID/secret and funded API balance).
+- [x] Add browser voice dictation and speech playback (browser-dependent).
+- [ ] Add isolated code execution, persistent cloud backups, scheduler-driven learning and Android app packaging.
 - [ ] Build Android wrapper against a GitHub-hosted API; do not use the former AppDeploy URL.
 - [ ] Create staging deployment from this repository and cut over only after acceptance tests.
 
 ### Current truth
-The frontend UI is present, but several visible modules are still placeholders or text-only. No production deployment has been switched to this GitHub backend. AppDeploy is no longer the development target; it remains an old deployment and migration source only.
+The frontend UI is present. CORE/WORK/SHIELD/CONNECT/VOICE are partial; MEMORY persists client-encrypted records per account; RESEARCH and CREATOR have provider adapters but require secrets and live account verification. DEVELOPER sandbox, scheduled learning and Android packaging remain incomplete. No production deployment has been switched to this GitHub backend. AppDeploy is no longer the development target; it remains an old deployment and migration source only.
+
+
+## Audit patches (2026-11-16 late)
+- [x] Fix MEMORY list response field mismatch (`records`, not `items`).
+- [x] Validate vault encryption metadata and cap registration password length.
+- [x] Correct module readiness labels and remove the false daily-learning claim.
+- [x] Protect paid Creator generation behind LOW authentication and per-IP rate limits.
+- [x] Separate Creator submission and polling limits so polling is not blocked after a few checks.
+- [x] Store opaque job-token digests and enforce token ownership on media status requests; expire jobs after 24 hours.
+- [x] Add real Research and Higgsfield adapters with explicit missing-credential errors.
+- [ ] Add persistent rate limiting, audit events, account recovery, backups and production deployment.
+- [ ] Generate and commit `package-lock.json`.
+- [ ] Build Android only after a production HTTPS API URL and cross-origin/mobile session strategy exist.
