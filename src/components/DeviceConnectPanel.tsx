@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { RadioTower, ShieldCheck, Smartphone, RefreshCw, Unplug } from "lucide-react";
+import { RadioTower, ShieldCheck, Smartphone, Unplug } from "lucide-react";
 
 type LinkedDevice = { id: string; name: string; online: boolean; telemetry: { batteryPercent?: number | null; appState?: string; network?: string; lastSeen: number } };
 const api = (path: string) => (import.meta.env.VITE_LOW_API_URL || "") + "/api/devices" + path;
