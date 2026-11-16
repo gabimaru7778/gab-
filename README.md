@@ -29,7 +29,8 @@ Vite: puerto 5173. API: puerto 3001. Compilar: `npm run build`.
 - SHIELD: análisis defensivo del texto; no realiza escaneos ni conexiones a objetivos.
 - CONNECT: emisión básica de claves de usuario; todavía no es un API gateway completo.
 - CREATOR: adaptador multimedia pendiente.
-- VOICE, RESEARCH con navegación real, sincronización CLOUD multi-dispositivo, scheduler LEARNING, ejecución aislada DEVELOPER y conectores: pendientes.
+- VOICE: dictado iniciado por el usuario y lectura en voz alta mediante APIs del navegador; la disponibilidad depende de Safari/navegador y permisos del dispositivo. No hay escucha en segundo plano ni voz conversacional en streaming.
+- RESEARCH con navegación real, sincronización CLOUD multi-dispositivo, scheduler LEARNING, ejecución aislada DEVELOPER y conectores: pendientes.
 
 ## Seguridad y despliegue
 
