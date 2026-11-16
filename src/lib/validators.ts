@@ -11,7 +11,8 @@ export function validateJson(raw: string, required: string): ValidationResult {
       if (value === null || Array.isArray(value) || typeof value !== "object") {
         return { valid: false, message: "El contenido no es un objeto JSON.", details };
       }
-      const missing = keys.filter((key) => !(key in value));
+      const record = value as Record<string, unknown>;
+      const missing = keys.filter((key) => !Object.hasOwn(record, key));
       if (missing.length) return { valid: false, message: "Faltan campos obligatorios.", details: [...details, "Campos ausentes: " + missing.join(", ")] };
       details.push("Campos requeridos presentes: " + keys.join(", "));
     }
@@ -27,25 +28,51 @@ export function validateCsv(raw: string): ValidationResult {
   let row: string[] = [];
   let field = "";
   let quoted = false;
+  let afterQuote = false;
+  const invalid = (message: string): ValidationResult => ({ valid: false, message: "CSV no válido.", details: [message] });
+
+  const finishRow = () => {
+    row.push(field.trim());
+    field = "";
+    if (row.some((value) => value.length > 0)) rows.push(row);
+    row = [];
+    afterQuote = false;
+  };
+
   for (let i = 0; i < raw.length; i += 1) {
     const char = raw[i];
     if (quoted) {
       if (char === '"' && raw[i + 1] === '"') { field += '"'; i += 1; }
-      else if (char === '"') quoted = false;
+      else if (char === '"') { quoted = false; afterQuote = true; }
       else field += char;
-    } else if (char === '"' && field.length === 0) quoted = true;
+      continue;
+    }
+
+    if (afterQuote) {
+      if (char === ",") { row.push(field.trim()); field = ""; afterQuote = false; }
+      else if (char === "\n" || char === "\r") {
+        if (char === "\r" && raw[i + 1] === "\n") i += 1;
+        finishRow();
+      } else if (/\s/.test(char)) {
+        // Ignore harmless whitespace between a closing quote and the delimiter.
+      } else return invalid("Hay caracteres después del cierre de un campo entre comillas.");
+      continue;
+    }
+
+    if (char === '"' && field.length === 0) quoted = true;
+    else if (char === '"') return invalid("Hay una comilla dentro de un campo sin escapar.");
     else if (char === ",") { row.push(field.trim()); field = ""; }
     else if (char === "\n" || char === "\r") {
       if (char === "\r" && raw[i + 1] === "\n") i += 1;
-      row.push(field.trim()); field = "";
-      if (row.some((value) => value.length > 0)) rows.push(row);
-      row = [];
+      finishRow();
     } else field += char;
   }
-  if (quoted) return { valid: false, message: "CSV no válido.", details: ["Hay un campo entre comillas que no se cerró."] };
+
+  if (quoted) return invalid("Hay un campo entre comillas que no se cerró.");
   row.push(field.trim());
   if (row.some((value) => value.length > 0)) rows.push(row);
   if (rows.length < 2) return { valid: false, message: "CSV incompleto.", details: ["Se requiere una fila de encabezados y al menos una fila de datos."] };
+
   const headers = rows[0];
   const duplicates = headers.filter((value, index) => !value || headers.indexOf(value) !== index);
   const widths = rows.slice(1).map((values, index) => ({ row: index + 2, count: values.length })).filter((item) => item.count !== headers.length);
