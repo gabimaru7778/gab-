@@ -69,3 +69,8 @@ LOW incluye un acceso externo al proyecto [Anil-matcha/Open-Generative-AI](https
 - No introduzcas secretos de LOW ni datos privados en servicios externos salvo que decidas compartirlos.
 
 La integración directa servidor-a-servidor con su catálogo de modelos queda pendiente de un adaptador API documentado y de credenciales guardadas en el gestor de secretos del hosting. No se simula como si ya estuviera conectada.
+
+
+## ECC: toolkit de ingeniería de agentes
+
+LOW incorpora un acceso al repositorio oficial [affaan-m/ECC](https://github.com/affaan-m/ECC) desde la sección ECC Engineering. ECC aporta flujos de trabajo de ingeniería y configuraciones para distintos agentes de desarrollo. No es el proveedor del chat de LOW ni se instala dentro del backend de producción. Revisa la documentación oficial para elegir el adaptador correspondiente al entorno de desarrollo y evita instalar simultáneamente métodos que dupliquen hooks.
