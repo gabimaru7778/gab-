@@ -11,10 +11,13 @@ db.exec(`CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,email TEXT UNIQUE 
 CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL,expires_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS vault_records(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,title TEXT NOT NULL,salt TEXT NOT NULL,iv TEXT NOT NULL,ciphertext TEXT NOT NULL,created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS api_keys(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,label TEXT NOT NULL,key_hash TEXT NOT NULL,created_at TEXT NOT NULL,last_used_at TEXT);
-CREATE TABLE IF NOT EXISTS media_jobs(id TEXT PRIMARY KEY,token_hash TEXT NOT NULL,kind TEXT NOT NULL,status TEXT NOT NULL,media_url TEXT,error TEXT,created_at TEXT NOT NULL,expires_at INTEGER NOT NULL);`);
+CREATE TABLE IF NOT EXISTS media_jobs(id TEXT PRIMARY KEY,token_hash TEXT NOT NULL,kind TEXT NOT NULL,status TEXT NOT NULL,media_url TEXT,error TEXT,created_at TEXT NOT NULL,expires_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS rate_limits(key TEXT PRIMARY KEY,count INTEGER NOT NULL,reset_at INTEGER NOT NULL);`);
 app.disable('x-powered-by');app.use(express.json({limit:'1mb'}));
-const buckets=new Map<string,{count:number;reset:number}>();
-function rateLimit(max:number,windowMs:number){return (q:express.Request,r:express.Response,n:express.NextFunction)=>{const key=(q.ip||q.socket.remoteAddress||'unknown')+':'+q.path,now=Date.now();let entry=buckets.get(key);if(!entry||entry.reset<now){entry={count:0,reset:now+windowMs};buckets.set(key,entry);}entry.count++;if(buckets.size>5000){for(const [k,v] of buckets)if(v.reset<now)buckets.delete(k);}r.setHeader('RateLimit-Limit',String(max));r.setHeader('RateLimit-Remaining',String(Math.max(0,max-entry.count)));if(entry.count>max){r.setHeader('Retry-After',String(Math.ceil((entry.reset-now)/1000)));r.status(429).json({error:'Demasiadas solicitudes. Espera antes de volver a intentarlo.'});return;}n();};}
+const updateRateLimit=db.prepare(`INSERT INTO rate_limits(key,count,reset_at) VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN rate_limits.reset_at<=? THEN 1 ELSE rate_limits.count+1 END,reset_at=CASE WHEN rate_limits.reset_at<=? THEN excluded.reset_at ELSE rate_limits.reset_at END`);
+const readRateLimit=db.prepare('SELECT count,reset_at FROM rate_limits WHERE key=?');
+let rateLimitOps=0;
+function rateLimit(max:number,windowMs:number){return (q:express.Request,r:express.Response,n:express.NextFunction)=>{const key=(q.ip||q.socket.remoteAddress||'unknown')+':'+q.path,now=Date.now();updateRateLimit.run(key,now+windowMs,now,now);const entry=readRateLimit.get(key) as {count:number;reset_at:number};if(++rateLimitOps%1000===0)db.prepare('DELETE FROM rate_limits WHERE reset_at<?').run(now);r.setHeader('RateLimit-Limit',String(max));r.setHeader('RateLimit-Remaining',String(Math.max(0,max-entry.count)));if(entry.count>max){r.setHeader('Retry-After',String(Math.max(1,Math.ceil((entry.reset_at-now)/1000))));r.status(429).json({error:'Demasiadas solicitudes. Espera antes de volver a intentarlo.'});return;}n();};}
 app.use('/api/auth',rateLimit(12,15*60*1000));
 app.use('/api/guest/chat',rateLimit(30,60*1000));
 app.use('/api/guest/agent',rateLimit(12,60*1000));
