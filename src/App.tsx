@@ -247,6 +247,7 @@ export default function App() {
     ['Laboratorio', Code2],
     ['ComfyUI Studio', Sparkles],
     ['Open Generative AI', Sparkles],
+    ['ECC Engineering', Bot],
   ] as const;
   async function login() {
     setErr('');
@@ -960,6 +961,34 @@ export default function App() {
               <h3>Cómo se integra con LOW</h3>
               <p>ComfyUI sigue siendo el motor multimedia conectado directamente a CREATOR. Open Generative AI queda como estudio complementario externo; no se envían automáticamente tus conversaciones, bóveda ni archivos de LOW a ese servicio.</p>
               <small className="subtle">El repositorio es software abierto, pero no todos los modelos que ofrece ni sus APIs alojadas son necesariamente abiertos o gratuitos. El cómputo, los modelos y sus licencias tienen condiciones propias.</small>
+            </article>
+          </section>
+        )}
+        {page === 'ECC Engineering' && (
+          <section className="content">
+            <small>LOW AGENTS / ENGINEERING TOOLKIT</small>
+            <h1>ECC <em>Engineering.</em></h1>
+            <p>Conjunto de herramientas open source para mejorar el ciclo de ingeniería de los agentes: planificar, implementar, probar, revisar, verificar y conservar aprendizajes. ECC se integra en los entornos de desarrollo compatibles; no es un modelo de IA ni un motor que se ejecute dentro del chat de LOW.</p>
+            <div className="grid">
+              <article>
+                <Bot />
+                <small>FUENTE OFICIAL</small>
+                <h3>Everything Claude Code</h3>
+                <p>Agentes, skills, hooks, reglas, memoria y flujos de trabajo. ECC declara licencia MIT y soporte de distintos entornos con capacidades variables.</p>
+                <a href="https://github.com/affaan-m/ECC" target="_blank" rel="noreferrer">Abrir ECC oficial en GitHub ↗</a>
+              </article>
+              <article>
+                <ShieldCheck />
+                <small>SEGURIDAD</small>
+                <h3>AgentShield</h3>
+                <p>Herramienta asociada para revisar configuraciones de agentes, permisos, hooks, MCP y secretos. Su ejecución requiere instalación y revisión separada.</p>
+                <a href="https://www.npmjs.com/package/ecc-agentshield" target="_blank" rel="noreferrer">Ver paquete oficial ↗</a>
+              </article>
+            </div>
+            <article className="learningCard">
+              <h3>Estado de integración</h3>
+              <p>ECC queda registrado como toolkit de ingeniería para el mantenimiento del repositorio LOW. No se instala ni ejecuta código de terceros automáticamente en el servidor de producción. Los agentes de auditoría propios de LOW continúan aislados y no reciben permisos para modificar, fusionar o desplegar cambios sin revisión humana.</p>
+              <small className="subtle">Para activar sus capacidades en un entorno de desarrollo compatible, sigue las instrucciones oficiales y elige un único método de instalación por entorno para evitar duplicar hooks.</small>
             </article>
           </section>
         )}
