@@ -1,39 +1,52 @@
-# LOW
+# LOW ONE
 
-LOW is a modular personal AI workspace. This repository is the source-control home for the LOW application and its planned migration away from a single hosting runtime.
+Este repositorio es la única fuente de verdad y desarrollo de LOW. El frontend React y el backend Node/TypeScript viven aquí.
 
-## Current migration baseline
+## Migración desde el runtime anterior
 
-The existing deployed application is a React + TypeScript frontend with an AppDeploy TypeScript backend. The first migration stage preserves existing behavior and documents runtime dependencies before changing providers or infrastructure.
+- UI recuperada de LOW AppDeploy `low-ko7kz4`, snapshot `1794859894510`, trasladada a `src/`.
+- Cliente frontend reemplazado por `src/lib/client.ts`; ya no requiere `@appdeploy/client`.
+- Backend independiente inicial en `server/index.ts`: registro/inicio de sesión por correo, sesiones en cookie HttpOnly, SQLite, chat y agente mediante API compatible OpenAI, bóveda cifrada del lado cliente, claves API por usuario y análisis SHIELD defensivo de texto.
+- La app antigua queda solo como referencia de migración; no se desarrollarán nuevas funciones allí.
 
-## Architecture direction
+## Configuración de proveedores
 
-- CORE: model routing, orchestration, policy and response composition
-- MEMORY: user-controlled encrypted memory and retrieval
-- RESEARCH: source-grounded research and retrieval
-- DEVELOPER: code analysis, patch proposals and test execution
-- CREATOR: image and video provider adapters
-- VOICE: speech input/output adapters
-- WORK: bounded agents and durable task execution
-- CONNECT: external APIs and tool adapters
-- CLOUD: storage, jobs and deployment adapters
-- SHIELD: defensive security review and audit logging
-- LEARNING: evaluation, regression tests and improvement proposals
+Consulta [docs/PROVIDER-SETUP.md](docs/PROVIDER-SETUP.md) para configurar IA, RESEARCH, ComfyUI, Open Generative AI y el despliegue.
 
-## Safety and engineering principles
+## Desarrollo
 
-1. Provider credentials are server-side secrets and must never be committed.
-2. Agents propose changes in isolated branches; tests and human approval gate production deployment.
-3. Security testing is limited to owned systems, explicit authorization, and safe passive review or controlled labs.
-4. Model providers are adapters, not hard-coded assumptions.
-5. Every capability must be marked as implemented, experimental, or planned.
+Node.js 22+:
 
-## Migration stages
+```bash
+npm install
+cp .env.example .env
+npm run dev
+```
 
-1. Import and verify the existing application source.
-2. Add reproducible build, typecheck and regression tests.
-3. Separate provider adapters and configuration.
-4. Add controlled agent workflows and observability.
-5. Deploy a staging environment before production cutover.
+Vite: puerto 5173. API: puerto 3001. Compilar: `npm run build`.
 
-See `docs/ROADMAP.md` for the staged plan.
+## Estado real de módulos
+
+- CORE: chat base; requiere `LOW_AI_API_KEY` y endpoint/modelo compatibles.
+- MEMORY: bóveda cifrada en cliente, almacenada por usuario en SQLite; se puede recuperar desde la misma instancia del backend al iniciar sesión en otro dispositivo; falta verificar despliegue persistente, backups y recuperación de clave.
+- WORK: agente textual; aún no ejecuta herramientas externas.
+- SHIELD: análisis defensivo del texto; no realiza escaneos ni conexiones a objetivos.
+- CONNECT: API key por usuario, endpoint Bearer `/v1/chat/completions`, listado de modelos y revocación de claves. Requiere configurar proveedor IA; sin CORS público para navegadores de terceros.
+- CREATOR: envío y consulta asíncrona de imágenes (workflow de imagen) y vídeo (workflow de vídeo) con ComfyUI; requiere una sesión LOW autenticada, `LOW_COMFYUI_URL` y workflows API propios. La generación se ejecuta en el servidor ComfyUI configurado; el cómputo GPU puede tener costes.
+- VOICE: dictado iniciado por el usuario y lectura en voz alta mediante APIs del navegador; la disponibilidad depende de Safari/navegador y permisos del dispositivo. No hay escucha en segundo plano ni voz conversacional en streaming.
+- RESEARCH: adaptador de búsqueda web Tavily implementado; requiere `TAVILY_API_KEY` en el entorno del servidor. Sin esa clave, devuelve un error de configuración explícito.
+- DEVELOPER: laboratorio JavaScript en iframe sandbox con origen opaco, CSP sin red, sin Node ni acceso a archivos y límite de 2 segundos; no es un contenedor de servidor.
+- CLOUD: los registros cifrados se guardan en SQLite por cuenta; el acceso entre dispositivos depende de usar la misma instancia persistente del backend. No hay backups automatizados ni despliegue persistente verificado.
+- LEARNING: la ruta de estado es un placeholder; no hay scheduler ni ciclos automáticos.
+- Android: no hay APK GitHub-native; requiere endpoint backend HTTPS desplegado y pipeline de compilación.
+
+## Seguridad y despliegue
+
+Consulta el [informe de auditoría técnica](docs/SECURITY-AUDIT.md) para ver parches aplicados y bloqueos antes de producción.
+
+Contraseñas derivadas con scrypt; sesiones aleatorias almacenadas como hash; cookies HttpOnly/SameSite. El rate limiting ahora persiste en SQLite entre reinicios. Antes de producción faltan verificación de correo, recuperación de cuenta, CSRF/origin hardening completo, backups, observabilidad y pruebas externas. No guardar secretos en Git. El repositorio sigue siendo público y no se ha cambiado su visibilidad. No hay OAuth ni recuperación de contraseña implementados.
+
+
+## Estudios multimedia complementarios
+
+LOW conserva ComfyUI como motor multimedia propio y añade un acceso al proyecto [Open Generative AI](https://github.com/Anil-matcha/Open-Generative-AI) como estudio externo complementario. La integración actual es un lanzador, no una copia ni un adaptador API; consulta [la guía de proveedores](docs/PROVIDER-SETUP.md) para conocer sus límites, costes y privacidad.
