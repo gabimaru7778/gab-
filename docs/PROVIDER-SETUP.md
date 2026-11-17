@@ -56,3 +56,16 @@ Antes de producción:
 ## Android
 
 No compilar ni publicar el APK hasta que exista un backend HTTPS estable y una estrategia de sesión móvil probada. No incrustar claves de proveedor dentro del APK.
+
+## Open Generative AI (estudio complementario)
+
+LOW incluye un acceso externo al proyecto [Anil-matcha/Open-Generative-AI](https://github.com/Anil-matcha/Open-Generative-AI). Su código declara licencia MIT y ofrece estudios de imagen, vídeo, lip-sync y workflows. Esta integración de LOW es un lanzador externo: no incorpora el código de esa aplicación en el backend ni comparte automáticamente chats, bóveda o archivos de LOW.
+
+- Repositorio: https://github.com/Anil-matcha/Open-Generative-AI
+- Versión alojada: https://muapi.ai/open-generative-ai
+- La versión alojada puede requerir cuenta, credenciales de proveedor o créditos y está sujeta a sus propias condiciones.
+- La licencia del repositorio no convierte automáticamente en libres las APIs alojadas, todos los modelos, pesos ni sus usos comerciales. Revisa las licencias de cada modelo y proveedor.
+- Para una instalación propia, sigue las instrucciones y requisitos del repositorio original. Necesitarás un equipo/servidor compatible; un iPhone por sí solo no sustituye el hardware de inferencia.
+- No introduzcas secretos de LOW ni datos privados en servicios externos salvo que decidas compartirlos.
+
+La integración directa servidor-a-servidor con su catálogo de modelos queda pendiente de un adaptador API documentado y de credenciales guardadas en el gestor de secretos del hosting. No se simula como si ya estuviera conectada.
