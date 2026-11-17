@@ -45,7 +45,7 @@
 - [ ] Switch production only after acceptance checks pass.
 
 ## Current known baseline
-The recovered AppDeploy snapshot is version `1794036989678`. It contains a React/TypeScript UI, a TypeScript backend, a calculator tool, a client-side encrypted vault flow, an initial agent endpoint, Higgsfield media integration and a passive authorized security-review route. These are baseline observations, not a claim that every external provider or workflow is fully operational.
+The recovered AppDeploy snapshot is version `1794036989678`. It contains a React/TypeScript UI, a TypeScript backend, a calculator tool, a client-side encrypted vault flow, an initial agent endpoint, ComfyUI media integration and a passive authorized security-review route. These are baseline observations, not a claim that every external provider or workflow is fully operational.
 
 
 ## GitHub-native progress (2026-11-16)
@@ -59,7 +59,7 @@ The recovered AppDeploy snapshot is version `1794036989678`. It contains a React
 - [x] Add runtime API smoke tests for auth, vault persistence/isolation, API keys, SHIELD, Research and Creator provider readiness.
 - [ ] Complete CSRF strategy, durable rate limiting, account verification/recovery, backups and audit events.
 - [x] Add real web-search adapter (Tavily; requires `TAVILY_API_KEY`).
-- [x] Add Higgsfield image/video job adapter (requires API key ID/secret and funded API balance).
+- [x] Add ComfyUI image/video job adapter (requires API key ID/secret and funded API balance).
 - [x] Add browser voice dictation and speech playback (browser-dependent).
 - [x] Add an isolated browser JavaScript sandbox with CSP network denial, opaque origin and a 2-second execution limit (not a server/container sandbox).
 - [ ] Add persistent cloud backups, scheduler-driven learning and Android app packaging.
@@ -77,8 +77,18 @@ The frontend UI is present. CORE/WORK/SHIELD/CONNECT/VOICE are partial; MEMORY p
 - [x] Protect paid Creator generation behind LOW authentication and per-IP rate limits.
 - [x] Separate Creator submission and polling limits so polling is not blocked after a few checks.
 - [x] Store opaque job-token digests and enforce token ownership on media status requests; expire jobs after 24 hours.
-- [x] Add real Research and Higgsfield adapters with explicit missing-credential errors.
+- [x] Add real Research and ComfyUI adapters with explicit missing-configuration errors.
 - [x] Persist rate-limit counters in SQLite across process restarts.
 - [ ] Add audit events, account recovery, backups and production deployment.
 - [ ] Generate and commit `package-lock.json`.
 - [ ] Build Android only after a production HTTPS API URL and cross-origin/mobile session strategy exist.
+
+
+## Creator provider migration (2026-11-17)
+- [x] Remove Higgsfield endpoints and API key requirements from LOW Creator.
+- [x] Add ComfyUI API adapter using /prompt and /history.
+- [x] Add image/video API workflow configuration and prompt marker validation.
+- [ ] Install ComfyUI and compatible image/video models on a GPU host.
+- [ ] Export image and video API workflows containing {{PROMPT}} and configure runtime environment.
+- [ ] Verify secure media delivery URL, real image/video output and browser playback.
+- [ ] Run end-to-end tests against a live private ComfyUI instance.
