@@ -40,3 +40,12 @@ Alcance: revisión estática del código, revisión de endpoints y pruebas de in
 ## Resultado
 
 Los checks de TypeScript, build y pruebas de API han pasado en commits anteriores de esta misma rama. El último parche de aislamiento de límites está en verificación CI. No hay despliegue de producción ni se ha fusionado el PR.
+
+
+## ORS4Net KeyHunter: límites de integración
+
+Repositorio revisado: https://github.com/n0rs4rt/Ors4Net-keyHunter. Su README describe una aplicación Python de escritorio para Windows que enumera perfiles Wi-Fi guardados y puede mostrar contraseñas, importar/exportar perfiles y comprobar exposición mediante k-anonymity.
+
+LOW solo incorpora un enlace informativo al proyecto. No se integra extracción de contraseñas, recolección remota, importación/exportación de perfiles, eliminación de redes, validación de credenciales ni envío de secretos a LOW. Los reportes que genere el programa pueden contener contraseñas y deben permanecer bajo control local del propietario.
+
+La herramienta requiere Windows y hardware Wi-Fi compatible; no se ejecuta en el iPhone ni en el backend web de LOW. Revisa el código y la licencia del proyecto original antes de instalar binarios.
