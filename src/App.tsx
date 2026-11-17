@@ -177,6 +177,7 @@ export default function App() {
   const [sandboxOutput, setSandboxOutput] = useState('La salida aparecerá aquí.');
   const [sandboxRun, setSandboxRun] = useState(0);
   const developerFrameRef = useRef<HTMLIFrameElement | null>(null);
+  const sandboxTimerRef = useRef<number | undefined>(undefined);
   useEffect(() => {
     auth
       .getUser()
@@ -189,6 +190,7 @@ export default function App() {
     const onSandboxMessage = (event: MessageEvent) => {
       if (event.source !== frame?.contentWindow || !event.data || event.data.__lowSandbox !== true) return;
       const text = String(event.data.text || '');
+      if (event.data.type === 'done' || event.data.type === 'error') { window.clearTimeout(sandboxTimerRef.current); sandboxTimerRef.current = undefined; }
       if (event.data.type === 'log') setSandboxOutput(current => current === 'Ejecutando…' ? text : current + '\\n' + text);
       if (event.data.type === 'error') setSandboxOutput(current => (current === 'Ejecutando…' ? '' : current + '\\n') + 'ERROR: ' + text);
       if (event.data.type === 'done') setSandboxOutput(current => current === 'Ejecutando…' ? 'Ejecución terminada sin salida.' : current + '\\nEjecución terminada.');
@@ -200,6 +202,7 @@ export default function App() {
     if (!sandboxRun) return;
     const frame = developerFrameRef.current;
     if (!frame) return;
+    window.clearTimeout(sandboxTimerRef.current);
     setSandboxOutput('Ejecutando…');
     const source = JSON.stringify(sandboxCode).replace(/</g, '\\u003c');
     frame.srcdoc = `<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; img-src data:; style-src 'unsafe-inline'; object-src 'none'; base-uri 'none'; form-action 'none'"></head><body><script>
@@ -209,11 +212,11 @@ export default function App() {
       window.onerror=(message,source,line,column,error)=>send('error',error?.stack||String(message)+' ('+line+':'+column+')');
       try { new Function('console', ${source})(localConsole); send('done'); } catch(error) { send('error',error?.stack||String(error)); }
     <\/script></body></html>`;
-    const timeout = window.setTimeout(() => {
+    sandboxTimerRef.current = window.setTimeout(() => {
       setSandboxOutput(current => current + '\\nTiempo límite de 2 segundos alcanzado. El entorno se reinició.');
       frame.srcdoc = 'about:blank';
     }, 2000);
-    return () => window.clearTimeout(timeout);
+    return () => window.clearTimeout(sandboxTimerRef.current);
   }, [sandboxRun]);
   useEffect(() => {
     if (page === 'Higgsfield Studio') {
