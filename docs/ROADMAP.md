@@ -59,7 +59,7 @@ The recovered AppDeploy snapshot is version `1794036989678`. It contains a React
 - [x] Add runtime API smoke tests for auth, vault persistence/isolation, API keys, SHIELD, Research and Creator provider readiness.
 - [ ] Complete CSRF strategy, durable rate limiting, account verification/recovery, backups and audit events.
 - [x] Add real web-search adapter (Tavily; requires `TAVILY_API_KEY`).
-- [x] Add ComfyUI image/video job adapter (requires API key ID/secret and funded API balance).
+- [x] Add ComfyUI image/video job adapter (requires a private ComfyUI endpoint and image/video API workflows).
 - [x] Add browser voice dictation and speech playback (browser-dependent).
 - [x] Add an isolated browser JavaScript sandbox with CSP network denial, opaque origin and a 2-second execution limit (not a server/container sandbox).
 - [ ] Add persistent cloud backups, scheduler-driven learning and Android app packaging.
