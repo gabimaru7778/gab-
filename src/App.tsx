@@ -173,6 +173,10 @@ export default function App() {
   const [learningReport, setLearningReport] = useState('');
   const [learningAt, setLearningAt] = useState('');
   const [higgsfieldConfigured, setHiggsfieldConfigured] = useState(false);
+  const [sandboxCode, setSandboxCode] = useState("console.log('Hola desde LOW');\nconst total = [2, 4, 6].reduce((a, b) => a + b, 0);\nconsole.log('Total:', total);");
+  const [sandboxOutput, setSandboxOutput] = useState('La salida aparecerá aquí.');
+  const [sandboxRun, setSandboxRun] = useState(0);
+  const developerFrameRef = useRef<HTMLIFrameElement | null>(null);
   useEffect(() => {
     auth
       .getUser()
@@ -180,6 +184,37 @@ export default function App() {
       .catch(() => setErr('No se pudo restaurar la sesión.'))
       .finally(() => setReady(true));
   }, []);
+  useEffect(() => {
+    const frame = developerFrameRef.current;
+    const onSandboxMessage = (event: MessageEvent) => {
+      if (event.source !== frame?.contentWindow || !event.data || event.data.__lowSandbox !== true) return;
+      const text = String(event.data.text || '');
+      if (event.data.type === 'log') setSandboxOutput(current => current === 'Ejecutando…' ? text : current + '\\n' + text);
+      if (event.data.type === 'error') setSandboxOutput(current => (current === 'Ejecutando…' ? '' : current + '\\n') + 'ERROR: ' + text);
+      if (event.data.type === 'done') setSandboxOutput(current => current === 'Ejecutando…' ? 'Ejecución terminada sin salida.' : current + '\\nEjecución terminada.');
+    };
+    window.addEventListener('message', onSandboxMessage);
+    return () => window.removeEventListener('message', onSandboxMessage);
+  }, []);
+  useEffect(() => {
+    if (!sandboxRun) return;
+    const frame = developerFrameRef.current;
+    if (!frame) return;
+    setSandboxOutput('Ejecutando…');
+    const source = JSON.stringify(sandboxCode).replace(/</g, '\\u003c');
+    frame.srcdoc = `<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; img-src data:; style-src 'unsafe-inline'; object-src 'none'; base-uri 'none'; form-action 'none'"></head><body><script>
+      const send=(type,text='')=>parent.postMessage({__lowSandbox:true,type,text},'*');
+      const fmt=value=>{try{return typeof value==='string'?value:JSON.stringify(value)??String(value)}catch{return String(value)}};
+      const localConsole={log:(...v)=>send('log',v.map(fmt).join(' ')),info:(...v)=>send('log',v.map(fmt).join(' ')),warn:(...v)=>send('log','WARN: '+v.map(fmt).join(' ')),error:(...v)=>send('error',v.map(fmt).join(' '))};
+      window.onerror=(message,source,line,column,error)=>send('error',error?.stack||String(message)+' ('+line+':'+column+')');
+      try { new Function('console', ${source})(localConsole); send('done'); } catch(error) { send('error',error?.stack||String(error)); }
+    <\/script></body></html>`;
+    const timeout = window.setTimeout(() => {
+      setSandboxOutput(current => current + '\\nTiempo límite de 2 segundos alcanzado. El entorno se reinició.');
+      frame.srcdoc = 'about:blank';
+    }, 2000);
+    return () => window.clearTimeout(timeout);
+  }, [sandboxRun]);
   useEffect(() => {
     if (page === 'Higgsfield Studio') {
       api.get('/api/guest/integrations/higgsfield').then(r => setHiggsfieldConfigured(Boolean(r.data.configured))).catch(() => setHiggsfieldConfigured(false));
@@ -207,6 +242,7 @@ export default function App() {
     ['Agentes y API', Globe2],
     ['Ciberseguridad', ShieldCheck],
     ['Módulos', BrainCircuit],
+    ['Laboratorio', Code2],
     ['Higgsfield Studio', Sparkles],
   ] as const;
   async function login() {
@@ -587,6 +623,22 @@ export default function App() {
             <small className="hint">
               LOW CORE · {mode.toUpperCase()} · MODO INVITADO DISPONIBLE
             </small>
+          </section>
+        )}
+        {page === 'Laboratorio' && (
+          <section className="content">
+            <small>DEVELOPER / SANDBOX LOCAL</small>
+            <h1>Prueba código. <em>Sin tocar el servidor.</em></h1>
+            <p>Ejecutor JavaScript dentro de un iframe aislado del origen principal. No tiene Node.js, acceso a archivos ni conexión de red; se reinicia después de cada ejecución.</p>
+            <div className="noteForm">
+              <label>Código JavaScript</label>
+              <textarea className="sandboxEditor" value={sandboxCode} onChange={event => setSandboxCode(event.target.value)} spellCheck={false} rows={10} />
+              <button className="primary" onClick={() => setSandboxRun(value => value + 1)}>Ejecutar en sandbox <Code2 size={16} /></button>
+              <label>Salida</label>
+              <pre className="sandboxOutput">{sandboxOutput}</pre>
+              <iframe ref={developerFrameRef} title="LOW JavaScript sandbox" sandbox="allow-scripts" className="sandboxFrame" />
+            </div>
+            <small className="subtle">Límite: es un laboratorio educativo de JavaScript en el navegador, no un contenedor Linux ni un entorno para ejecutar Python, instalar paquetes o acceder a repositorios.</small>
           </section>
         )}
         {page === 'Higgsfield Studio' && (
