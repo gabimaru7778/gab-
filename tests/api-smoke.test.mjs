@@ -16,6 +16,7 @@ before(async()=>{
 });
 after(()=>{child?.kill('SIGTERM');rmSync(dir,{recursive:true,force:true});});
 test('health endpoint is available',async()=>{const r=await fetch(base+'/api/health');assert.equal(r.status,200);assert.equal((await r.json()).app,'LOW ONE');});
+test('registration rejects passwords longer than the supported bound',async()=>{const r=await fetch(base+'/api/auth/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:'long-'+Date.now()+'@example.test',name:'Long Password',password:'x'.repeat(201)})});assert.equal(r.status,400);});
 test('registration creates a session and isolates vault records',async()=>{
  const email='smoke-'+Date.now()+'@example.test';
  const r=await fetch(base+'/api/auth/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,name:'Smoke Test',password:'this is a long test password'})});
@@ -39,6 +40,7 @@ test('API keys authenticate, expose models and can be revoked',async()=>{
  const created=await fetch(base+'/api/keys',{method:'POST',headers:{cookie,'content-type':'application/json'},body:JSON.stringify({label:'test agent'})});
  assert.equal(created.status,201);const value=(await created.json()).apiKey;assert.match(value,/^low_/);
  const models=await fetch(base+'/v1/models',{headers:{authorization:'Bearer '+value}});assert.equal(models.status,200);assert.equal((await models.json()).data[0].id,'low-core');
+ const completion=await fetch(base+'/v1/chat/completions',{method:'POST',headers:{authorization:'Bearer '+value,'content-type':'application/json'},body:JSON.stringify({model:'low-core',messages:[{role:'user',content:'Hola'}]})});assert.equal(completion.status,503);
  const denied=await fetch(base+'/v1/models',{headers:{authorization:'Bearer low_invalid'}});assert.equal(denied.status,401);
  const listed=await fetch(base+'/api/keys',{headers:{cookie}});const keyId=(await listed.json()).keys[0].id;
  const revoked=await fetch(base+'/api/keys/'+keyId,{method:'DELETE',headers:{cookie}});assert.equal(revoked.status,200);
