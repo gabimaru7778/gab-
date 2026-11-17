@@ -815,3 +815,7 @@ button:disabled {
 }
 
 .keyRevoke { border: 1px solid #6b4557; border-radius: 7px; background: #2b1b25; color: #efb6c7; padding: 5px 8px; font-size: 10px; }
+
+.sandboxEditor { width: 100%; min-height: 210px; resize: vertical; border: 1px solid #44384f; border-radius: 12px; background: #0b0a10; color: #e9e0fa; padding: 14px; font: 12px/1.6 'DM Mono', monospace; }
+.sandboxOutput { min-height: 90px; white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid #383040; border-radius: 10px; background: #09080d; color: #d5c4f3; padding: 12px; font: 11px/1.6 'DM Mono', monospace; }
+.sandboxFrame { width: 1px; height: 1px; border: 0; position: absolute; left: -10000px; }
