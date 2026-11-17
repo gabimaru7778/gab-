@@ -9,6 +9,10 @@ Este repositorio es la única fuente de verdad y desarrollo de LOW. El frontend 
 - Backend independiente inicial en `server/index.ts`: registro/inicio de sesión por correo, sesiones en cookie HttpOnly, SQLite, chat y agente mediante API compatible OpenAI, bóveda cifrada del lado cliente, claves API por usuario y análisis SHIELD defensivo de texto.
 - La app antigua queda solo como referencia de migración; no se desarrollarán nuevas funciones allí.
 
+## Configuración de proveedores
+
+Consulta [docs/PROVIDER-SETUP.md](docs/PROVIDER-SETUP.md) para configurar de forma segura IA, RESEARCH, Higgsfield y el despliegue.
+
 ## Desarrollo
 
 Node.js 22+:
