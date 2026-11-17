@@ -53,7 +53,8 @@ The recovered AppDeploy snapshot is version `1794036989678`. It contains a React
 - [x] Import the LOW React interface and remove its direct dependency on `@appdeploy/client`.
 - [x] Add a first-party Node/Express API with SQLite, account sessions, chat/agent adapter, encrypted-vault persistence and defensive text review.
 - [x] Add basic in-memory API rate limits and configurable production origin allowlist.
-- [x] Add GitHub Actions CI; current verified run: typecheck, Vite build and tests succeeded before the rate-limit patch. A new run is checking the latest patch.
+- [x] Add GitHub Actions CI; latest verified run `43984625412` passed typecheck, Vite build and all 15 API/security tests on commit `695509c68e8f528dd0badf5af88eaf121f27cd55`.
+- [x] Configure daily schedule and manual dispatch; GitHub activates these triggers after the workflow is merged into the default branch.
 - [ ] Add a committed npm lockfile (CI currently uses `npm install`).
 - [x] Add runtime API smoke tests for auth, vault persistence/isolation, API keys, SHIELD, Research and Creator provider readiness.
 - [ ] Complete CSRF strategy, durable rate limiting, account verification/recovery, backups and audit events.
@@ -66,7 +67,7 @@ The recovered AppDeploy snapshot is version `1794036989678`. It contains a React
 - [ ] Create staging deployment from this repository and cut over only after acceptance tests.
 
 ### Current truth
-The frontend UI is present. CORE/WORK/SHIELD/CONNECT/VOICE are partial; MEMORY persists client-encrypted records per account; RESEARCH and CREATOR have provider adapters but require secrets and live account verification. DEVELOPER sandbox, scheduled learning and Android packaging remain incomplete. No production deployment has been switched to this GitHub backend. AppDeploy is no longer the development target; it remains an old deployment and migration source only.
+The frontend UI is present. CORE/WORK/SHIELD/CONNECT/VOICE are partial; MEMORY persists client-encrypted records per account; RESEARCH and CREATOR have provider adapters but require secrets and live account verification. DEVELOPER has a restricted browser sandbox (not server execution); AI learning cycles and Android packaging remain incomplete. No production deployment has been switched to this GitHub backend. AppDeploy is no longer the development target; it remains an old deployment and migration source only.
 
 
 ## Audit patches (2026-11-16 late)
