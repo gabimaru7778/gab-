@@ -42,4 +42,6 @@ Vite: puerto 5173. API: puerto 3001. Compilar: `npm run build`.
 
 ## Seguridad y despliegue
 
+Consulta el [informe de auditoría técnica](docs/SECURITY-AUDIT.md) para ver parches aplicados y bloqueos antes de producción.
+
 Contraseñas derivadas con scrypt; sesiones aleatorias almacenadas como hash; cookies HttpOnly/SameSite. El rate limiting ahora persiste en SQLite entre reinicios. Antes de producción faltan verificación de correo, recuperación de cuenta, CSRF/origin hardening completo, backups, observabilidad y pruebas externas. No guardar secretos en Git. El repositorio sigue siendo público y no se ha cambiado su visibilidad. No hay OAuth ni recuperación de contraseña implementados.
