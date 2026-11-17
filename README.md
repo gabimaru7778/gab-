@@ -11,7 +11,7 @@ Este repositorio es la única fuente de verdad y desarrollo de LOW. El frontend 
 
 ## Configuración de proveedores
 
-Consulta [docs/PROVIDER-SETUP.md](docs/PROVIDER-SETUP.md) para configurar IA, RESEARCH, ComfyUI y el despliegue.
+Consulta [docs/PROVIDER-SETUP.md](docs/PROVIDER-SETUP.md) para configurar IA, RESEARCH, ComfyUI, Open Generative AI y el despliegue.
 
 ## Desarrollo
 
@@ -45,3 +45,8 @@ Vite: puerto 5173. API: puerto 3001. Compilar: `npm run build`.
 Consulta el [informe de auditoría técnica](docs/SECURITY-AUDIT.md) para ver parches aplicados y bloqueos antes de producción.
 
 Contraseñas derivadas con scrypt; sesiones aleatorias almacenadas como hash; cookies HttpOnly/SameSite. El rate limiting ahora persiste en SQLite entre reinicios. Antes de producción faltan verificación de correo, recuperación de cuenta, CSRF/origin hardening completo, backups, observabilidad y pruebas externas. No guardar secretos en Git. El repositorio sigue siendo público y no se ha cambiado su visibilidad. No hay OAuth ni recuperación de contraseña implementados.
+
+
+## Estudios multimedia complementarios
+
+LOW conserva ComfyUI como motor multimedia propio y añade un acceso al proyecto [Open Generative AI](https://github.com/Anil-matcha/Open-Generative-AI) como estudio externo complementario. La integración actual es un lanzador, no una copia ni un adaptador API; consulta [la guía de proveedores](docs/PROVIDER-SETUP.md) para conocer sus límites, costes y privacidad.
