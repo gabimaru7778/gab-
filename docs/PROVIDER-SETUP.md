@@ -1,48 +1,58 @@
 # Configuración de proveedores y despliegue de LOW
 
-## Secretos del servidor
+## Secretos y variables del servidor
 
-Configura estos valores en el gestor de secretos del **servicio donde se despliegue el backend**. Los secretos guardados en GitHub Actions no se convierten automáticamente en variables de entorno del servidor.
+Configura estos valores en el gestor de configuración del servicio donde se ejecute el backend. GitHub Actions Secrets no se convierten automáticamente en variables de entorno del servidor.
 
-| Variable | Uso | Obligatoria |
-|---|---|---|
-| `LOW_AI_API_KEY` | Chat, WORK y SHIELD | Sí, para respuestas IA |
-| `LOW_AI_BASE_URL` | Base URL compatible con OpenAI | No |
-| `LOW_AI_MODEL` | Modelo del proveedor | No |
-| `TAVILY_API_KEY` | Búsqueda web RESEARCH | Sí, para búsqueda real |
-| `HF_API_KEY_ID` | Identificador de la API de Higgsfield | Sí, para CREATOR |
-| `HF_API_KEY_SECRET` | Secreto de la API de Higgsfield | Sí, para CREATOR |
-| `APP_ORIGIN` | Origen público del frontend | Sí, en producción |
-| `APP_ORIGINS` | Lista separada por comas de orígenes permitidos | Alternativa a APP_ORIGIN |
-| `LOW_DATA_DIR` | Directorio persistente de SQLite | Sí, configurar almacenamiento persistente |
+| Variable | Uso |
+|---|---|
+| `LOW_AI_API_KEY` | Chat, WORK y SHIELD |
+| `LOW_AI_BASE_URL` | Endpoint compatible con OpenAI |
+| `LOW_AI_MODEL` | Modelo del proveedor |
+| `TAVILY_API_KEY` | Búsqueda RESEARCH |
+| `LOW_COMFYUI_URL` | Dirección privada de ComfyUI, por ejemplo `http://127.0.0.1:8188` |
+| `LOW_COMFYUI_PUBLIC_URL` | URL pública/HTTPS desde la que el navegador puede descargar resultados; opcional si el host privado también es accesible desde el navegador |
+| `LOW_COMFYUI_IMAGE_WORKFLOW` | JSON de workflow ComfyUI en formato API para imagen |
+| `LOW_COMFYUI_VIDEO_WORKFLOW` | JSON de workflow ComfyUI en formato API para vídeo |
+| `APP_ORIGIN` | Origen público del frontend |
+| `APP_ORIGINS` | Lista separada por comas de orígenes permitidos |
+| `LOW_DATA_DIR` | Directorio persistente de SQLite |
 
-No pegues claves en el chat, en Issues, en archivos del repositorio ni en el código del navegador. Si una clave se expone, revócala y genera otra.
+No pegues secretos ni workflows con credenciales en el chat, Issues o repositorio.
 
-## Higgsfield: CREATOR
+## CREATOR: ComfyUI (sustituto de Higgsfield)
 
-1. Crea una cuenta API en [Open Higgsfield](https://open.higgsfield.ai/).
-2. Genera las credenciales ID y Secret.
-3. Añádelas como `HF_API_KEY_ID` y `HF_API_KEY_SECRET` al entorno del backend.
-4. Confirma que la cuenta API tiene saldo disponible. La suscripción del sitio Higgsfield y el saldo API son productos de facturación separados.
-5. Prueba primero una imagen sencilla; revisa el coste del modelo y sus parámetros antes de generar vídeo.
+LOW ya no usa credenciales ni endpoints de Higgsfield. CREATOR utiliza la API HTTP de ComfyUI, un motor abierto que se puede ejecutar en un servidor controlado por ti.
 
-LOW utiliza Soul Standard para imágenes y Seedance 2.0 para vídeo. Los trabajos se consultan en segundo plano y sus tokens de consulta expiran después de 24 horas.
+1. Instala ComfyUI desde el repositorio oficial: https://github.com/Comfy-Org/ComfyUI
+2. Instala y descarga modelos compatibles con los workflows elegidos. Para vídeo, Wan 2.2 está integrado en ComfyUI: https://github.com/Wan-Video/Wan2.2
+3. Inicia ComfyUI en una red privada y configura `LOW_COMFYUI_URL` en el backend.
+4. En ComfyUI, exporta cada workflow en formato API (no el formato visual de navegador).
+5. En ambos workflows, coloca el marcador literal `{{PROMPT}}` en el campo de texto que recibirá la descripción. Guarda el JSON completo como `LOW_COMFYUI_IMAGE_WORKFLOW` y `LOW_COMFYUI_VIDEO_WORKFLOW` en la configuración del servidor.
+6. Si el navegador no puede acceder a la dirección privada del servidor, publica solo la ruta de entrega de archivos detrás de HTTPS y configura `LOW_COMFYUI_PUBLIC_URL`. No expongas la API administrativa de ComfyUI sin autenticación, firewall y proxy seguro.
+7. Prueba primero una imagen y después un vídeo corto. Comprueba VRAM, tiempo, almacenamiento y licencia del modelo.
+
+La API de ComfyUI recibe workflows por `POST /prompt`, consulta trabajos por `GET /history/{prompt_id}` y entrega archivos por `GET /view`. LOW conserva su autenticación de usuario, token temporal de trabajo y límite de solicitudes.
+
+### Costes y límites reales
+
+El código de ComfyUI es abierto y la instalación propia no cobra por cada llamada a un proveedor externo. Sin embargo, no significa generación gratuita: necesitas hardware con GPU o un servidor alquilado, electricidad, almacenamiento y ancho de banda. Cada modelo tiene sus propios requisitos y términos de licencia. GitHub aloja el código; no proporciona cómputo GPU gratuito.
 
 ## RESEARCH
 
-Crea una clave de Tavily y configúrala como `TAVILY_API_KEY`. Si no está configurada, LOW devolverá un error de configuración y no afirmará haber buscado en Internet.
+Configura `TAVILY_API_KEY`. Sin ella, LOW devolverá un error explícito y no afirmará haber buscado en Internet.
 
 ## Despliegue
 
-El backend necesita un servicio Node.js persistente y almacenamiento persistente para `LOW_DATA_DIR`. Un hosting estático (por ejemplo, GitHub Pages) no puede ejecutar este backend SQLite.
+El backend necesita Node.js persistente y almacenamiento persistente para `LOW_DATA_DIR`. Un hosting estático como GitHub Pages no ejecuta este backend SQLite.
 
 Antes de producción:
-- configurar HTTPS y el origen exacto en `APP_ORIGIN`;
-- montar un volumen persistente para SQLite y copias de seguridad;
-- establecer límites persistentes de uso y observabilidad;
-- revisar autenticación, recuperación de cuenta, CSRF y política de datos;
-- realizar una prueba de restauración y una revisión externa de seguridad.
+- configurar HTTPS y origen exacto;
+- montar almacenamiento persistente y copias de seguridad;
+- mantener ComfyUI en red privada, con autenticación y límites;
+- revisar CSRF, recuperación de cuenta y política de datos;
+- realizar prueba de restauración y revisión externa de seguridad.
 
 ## Android
 
-No compilar ni publicar el APK hasta que exista un backend HTTPS estable y se haya resuelto el acceso autenticado desde la aplicación móvil. El backend actual utiliza cookies de sesión HttpOnly y protección por origen; un APK Capacitor que llame a un dominio distinto necesita una estrategia móvil/CORS/CSRF probada. No incrustar claves de proveedor dentro del APK.
+No compilar ni publicar el APK hasta que exista un backend HTTPS estable y una estrategia de sesión móvil probada. No incrustar claves de proveedor dentro del APK.
