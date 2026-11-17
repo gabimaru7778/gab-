@@ -248,6 +248,7 @@ export default function App() {
     ['ComfyUI Studio', Sparkles],
     ['Open Generative AI', Sparkles],
     ['ECC Engineering', Bot],
+    ['Wi-Fi Security', ShieldCheck],
   ] as const;
   async function login() {
     setErr('');
@@ -989,6 +990,23 @@ export default function App() {
               <h3>Estado de integración</h3>
               <p>ECC queda registrado como toolkit de ingeniería para el mantenimiento del repositorio LOW. No se instala ni ejecuta código de terceros automáticamente en el servidor de producción. Los agentes de auditoría propios de LOW continúan aislados y no reciben permisos para modificar, fusionar o desplegar cambios sin revisión humana.</p>
               <small className="subtle">Para activar sus capacidades en un entorno de desarrollo compatible, sigue las instrucciones oficiales y elige un único método de instalación por entorno para evitar duplicar hooks.</small>
+            </article>
+          </section>
+        )}
+        {page === 'Wi-Fi Security' && (
+          <section className="content">
+            <small>SHIELD / LOCAL NETWORK SECURITY</small>
+            <h1>Wi-Fi <em>Security.</em></h1>
+            <p>ORS4Net KeyHunter es una aplicación independiente para Windows que inventaría perfiles Wi-Fi guardados, evalúa su configuración y genera reportes. No es una librería web ni un servicio que pueda ejecutarse dentro del servidor de LOW.</p>
+            <article className="learningCard">
+              <h3>Proyecto original</h3>
+              <p>Consulta el código, licencia y documentación del autor antes de instalarlo. La herramienta puede mostrar contraseñas Wi-Fi guardadas en el equipo; trátalas como secretos y no compartas capturas, exportaciones ni reportes que las incluyan.</p>
+              <a href="https://github.com/n0rs4rt/Ors4Net-keyHunter" target="_blank" rel="noreferrer">Abrir ORS4Net KeyHunter en GitHub ↗</a>
+            </article>
+            <article className="learningCard">
+              <h3>Límites de seguridad de LOW</h3>
+              <p>LOW no extrae contraseñas del sistema, no recibe volcados de perfiles Wi-Fi, no valida ni reutiliza claves encontradas y no elimina ni importa perfiles. El acceso es únicamente al repositorio original para consulta.</p>
+              <small className="subtle">Requiere Windows y un adaptador Wi-Fi compatible. No puede ejecutarse en tu iPhone ni dentro de GitHub Pages o del backend web de LOW. Si utilizas el programa en un equipo propio, hazlo localmente y conserva los reportes bajo tu control.</small>
             </article>
           </section>
         )}
