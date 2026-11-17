@@ -17,7 +17,7 @@ Las futuras capacidades de agentes que propongan parches deberán trabajar en ra
 
 ## Sustitución de Higgsfield y costes de CREATOR
 
-El código actual documenta ComfyUI como proveedor de imagen/vídeo. No debe copiarse su API privada, eludirse autenticación ni falsearse el consumo para evitar pagos.
+El código anterior utilizaba Higgsfield; el runtime actual usa ComfyUI. No debe copiarse una API privada ni eludirse autenticación o facturación de servicios externos.
 
 Alternativa legítima: añadir un adaptador para un servidor propio de ComfyUI y modelos de generación con licencias compatibles. Esto evita pagar por cada llamada a ComfyUI, pero no hace que la generación sea gratis: requiere equipo con GPU o cómputo/hosting, electricidad y almacenamiento. La integración debe activarse solo cuando exista un endpoint privado autenticado y controles de uso.
 
