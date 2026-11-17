@@ -53,8 +53,8 @@ const modes = [
   ['Productividad', 'Planificación y trabajo'],
   ['Seguridad defensiva', 'Ciberseguridad autorizada'],
   ['Agente', 'Agente con herramientas y verificación'],
-  ['Imagen', 'Imágenes con Higgsfield'],
-  ['Video', 'Vídeo con Higgsfield'],
+  ['Imagen', 'Imágenes con ComfyUI'],
+  ['Video', 'Vídeo con ComfyUI'],
 ] as const;
 const modules = [
   ['CORE', 'Núcleo cognitivo', 'Razonamiento y coordinación', BrainCircuit],
@@ -172,7 +172,7 @@ export default function App() {
   const recognitionRef = useRef<any>(null);
   const [learningReport, setLearningReport] = useState('');
   const [learningAt, setLearningAt] = useState('');
-  const [higgsfieldConfigured, setHiggsfieldConfigured] = useState(false);
+  const [comfyConfigured, setComfyConfigured] = useState(false);
   const [sandboxCode, setSandboxCode] = useState("console.log('Hola desde LOW');\nconst total = [2, 4, 6].reduce((a, b) => a + b, 0);\nconsole.log('Total:', total);");
   const [sandboxOutput, setSandboxOutput] = useState('La salida aparecerá aquí.');
   const [sandboxRun, setSandboxRun] = useState(0);
@@ -218,8 +218,8 @@ export default function App() {
     return () => window.clearTimeout(sandboxTimerRef.current);
   }, [sandboxRun]);
   useEffect(() => {
-    if (page === 'Higgsfield Studio') {
-      api.get('/api/guest/integrations/higgsfield').then(r => setHiggsfieldConfigured(Boolean(r.data.configured))).catch(() => setHiggsfieldConfigured(false));
+    if (page === 'ComfyUI Studio') {
+      api.get('/api/guest/integrations/creator').then(r => setComfyConfigured(Boolean(r.data.configured))).catch(() => setComfyConfigured(false));
     }
   }, [page]);
   useEffect(() => {
@@ -245,7 +245,7 @@ export default function App() {
     ['Ciberseguridad', ShieldCheck],
     ['Módulos', BrainCircuit],
     ['Laboratorio', Code2],
-    ['Higgsfield Studio', Sparkles],
+    ['ComfyUI Studio', Sparkles],
   ] as const;
   async function login() {
     setErr('');
@@ -270,7 +270,7 @@ export default function App() {
       const wantsImage = mode === 'Imagen' || /\b(genera|crea|dibuja|diseña|ilustra|hazme|renderiza)\b.*\b(imagen|foto|ilustración|dibujo|logo|portada|ilustracion)\b/i.test(q);
       if (wantsImage || wantsVideo) {
         const kind = wantsVideo ? 'video' : 'image';
-        if (!user) throw new Error('Inicia sesión para usar CREATOR. La generación consume saldo de una cuenta API de Higgsfield.');
+        if (!user) throw new Error('Inicia sesión para usar CREATOR. La generación se procesa en tu servidor ComfyUI configurado.');
         const r = await api.post('/api/guest/media', { prompt: q, kind });
         let mediaUrl = r.data.mediaUrl || r.data.imageUrl || '';
         let mediaStatus = r.data.status || 'completed';
@@ -283,11 +283,11 @@ export default function App() {
             const poll = { data: pollData };
             mediaStatus = poll.data.status || 'processing';
             if (mediaStatus === 'completed') { mediaUrl = poll.data.mediaUrl || ''; break; }
-            if (['failed', 'nsfw', 'canceled'].includes(mediaStatus)) throw new Error(poll.data.error || 'Higgsfield no pudo completar la generación.');
+            if (['failed', 'nsfw', 'canceled'].includes(mediaStatus)) throw new Error(poll.data.error || 'ComfyUI no pudo completar la generación.');
           }
         }
-        if (mediaUrl) setMessages(v => [...v, { id: crypto.randomUUID(), role: 'assistant', content: kind === 'video' ? 'Vídeo creado con Higgsfield.' : 'Imagen creada con Higgsfield.', mediaUrl, mediaType: kind }]);
-        else setMessages(v => [...v, { id: crypto.randomUUID(), role: 'assistant', content: 'La generación sigue en proceso. Vuelve a intentarlo en unos momentos desde Higgsfield Studio.' }]);
+        if (mediaUrl) setMessages(v => [...v, { id: crypto.randomUUID(), role: 'assistant', content: kind === 'video' ? 'Vídeo creado con ComfyUI.' : 'Imagen creada con ComfyUI.', mediaUrl, mediaType: kind }]);
+        else setMessages(v => [...v, { id: crypto.randomUUID(), role: 'assistant', content: 'La generación sigue en proceso. Vuelve a intentarlo en unos momentos desde ComfyUI Studio.' }]);
       } else if (mode === 'Investigación') {
         const r = await api.post('/api/guest/research', { query: q });
         const sourceText = Array.isArray(r.data.sources) && r.data.sources.length
@@ -615,7 +615,7 @@ export default function App() {
                     send();
                   }
                 }}
-                placeholder={mode === 'Imagen' ? 'Describe la imagen que Higgsfield debe crear…' : mode === 'Video' ? 'Describe el vídeo que Higgsfield debe generar…' : mode === 'Agente' ? 'Asigna una misión; LOW planificará y usará herramientas seguras…' : 'Escribe lo que quieres explorar, aprender o crear…'}
+                placeholder={mode === 'Imagen' ? 'Describe la imagen que ComfyUI debe crear…' : mode === 'Video' ? 'Describe el vídeo que ComfyUI debe generar…' : mode === 'Agente' ? 'Asigna una misión; LOW planificará y usará herramientas seguras…' : 'Escribe lo que quieres explorar, aprender o crear…'}
               />
               <button className="voiceInput" type="button" aria-label={listening ? 'Detener dictado' : 'Dictar mensaje'} title={listening ? 'Detener dictado' : 'Dictar mensaje'} onClick={listening ? stopVoiceInput : startVoiceInput}><Mic size={17} />{listening ? 'Detener' : 'Voz'}</button>
               <button disabled={!input.trim() || busy} onClick={send}>
@@ -643,25 +643,25 @@ export default function App() {
             <small className="subtle">Límite: es un laboratorio educativo de JavaScript en el navegador, no un contenedor Linux ni un entorno para ejecutar Python, instalar paquetes o acceder a repositorios.</small>
           </section>
         )}
-        {page === 'Higgsfield Studio' && (
+        {page === 'ComfyUI Studio' && (
           <section className="content">
-            <small>LOW CREATOR / HIGGSFIELD API</small>
+            <small>LOW CREATOR / COMFYUI</small>
             <h1>Studio <em>multimedia.</em></h1>
-            <p>Genera imágenes con Grok Imagine 2.0 y vídeos con Seedance 2.5. Las solicitudes se procesan en los servidores de Higgsfield y LOW consulta su estado hasta recibir el resultado.</p>
+            <p>Genera imágenes y vídeos con workflows locales de ComfyUI. LOW envía el trabajo a tu servidor y consulta el estado hasta recibir el resultado.</p>
             <div className="creatorCard">
-              <div className="creatorStatus"><span className={higgsfieldConfigured ? 'statusDot online' : 'statusDot'} />{higgsfieldConfigured ? 'HIGGSFIELD API CONECTADA' : 'FALTA CONECTAR API KEY'}</div>
-              <p>{higgsfieldConfigured ? 'La credencial está guardada en el backend. La clave nunca se envía al navegador.' : 'Conecta tu API key de Higgsfield mediante el formulario seguro de credenciales de esta conversación. Pega la clave completa exactamente como la copiaste de open.higgsfield.ai; no la envíes por el chat.'}</p>
-              <a href="https://open.higgsfield.ai/api-keys" target="_blank" rel="noreferrer">Crear o consultar API key de Higgsfield ↗</a>
+              <div className="creatorStatus"><span className={comfyConfigured ? 'statusDot online' : 'statusDot'} />{comfyConfigured ? 'COMFYUI CONFIGURADO' : 'FALTA CONFIGURAR COMFYUI'}</div>
+              <p>{comfyConfigured ? 'El endpoint y los workflows están configurados en el backend. LOW no expone credenciales al navegador.' : 'Configura LOW_COMFYUI_URL y los workflows API de imagen y vídeo como variables del servidor. El workflow debe contener el marcador {{PROMPT}}.'}</p>
+              <a href="https://docs.comfy.org/development/core-concepts/workflow" target="_blank" rel="noreferrer">Documentación de ComfyUI ↗</a>
               <div className="studioActions">
                 <button className="primary" onClick={() => { setMode('Imagen'); setPage('Chat'); }}>Crear imagen <Sparkles size={16} /></button>
                 <button className="secondary" onClick={() => { setMode('Video'); setPage('Chat'); }}>Crear vídeo <Activity size={16} /></button>
               </div>
             </div>
             <div className="grid">
-              <article><Sparkles /><small>IMAGEN</small><h3>Grok Imagine 2.0</h3><p>Generación y edición de imágenes, con salida 1K o 2K.</p></article>
-              <article><Activity /><small>VÍDEO</small><h3>Seedance 2.5</h3><p>Vídeos de texto a vídeo, hasta 30 segundos, con resolución y audio configurables.</p></article>
+              <article><Sparkles /><small>IMAGEN</small><h3>Workflow de imagen</h3><p>Generación de imágenes con el modelo que cargues en tu workflow.</p></article>
+              <article><Activity /><small>VÍDEO</small><h3>Workflow de vídeo</h3><p>Generación de vídeo con Wan 2.2 u otro modelo compatible que cargues en ComfyUI.</p></article>
             </div>
-            <small className="subtle">El uso de la API de Higgsfield se factura por separado del plan web de Higgsfield. Requiere saldo prepago en su consola.</small>
+            <small className="subtle">ComfyUI es software abierto y puede ejecutarse sin tarifa por solicitud. El servidor GPU, la electricidad, el almacenamiento y los modelos pueden tener costes o licencias propias.</small>
           </section>
         )}
         {page === 'Aprendizaje' && (
@@ -917,19 +917,19 @@ export default function App() {
             </div>
           </section>
         )}
-        {page === 'Higgsfield Studio' && (
+        {page === 'ComfyUI Studio' && (
           <section className="content">
-            <small>CREATOR / HIGGSFIELD API</small>
+            <small>CREATOR / COMFYUI</small>
             <h1>Imagina. <em>LOW lo crea.</em></h1>
             <p>Generación de imágenes y vídeo desde el chat, con trabajos asíncronos y consulta de estado en el servidor.</p>
             <article className="learningCard">
-              <h3>{higgsfieldConfigured ? 'Proveedor conectado' : 'Falta conectar el proveedor'}</h3>
-              <p>{higgsfieldConfigured ? 'LOW detecta las dos credenciales del servidor. La disponibilidad y el saldo se confirman al enviar una generación.' : 'Configura HF_API_KEY_ID y HF_API_KEY_SECRET como secretos del entorno donde se ejecuta el backend. Nunca pegues estas claves en el chat ni en el repositorio.'}</p>
-              <small className="subtle">La API de Higgsfield se factura por separado de una suscripción web y puede consumir saldo por cada generación. Revisa el modelo, duración y coste antes de usarla.</small>
+              <h3>{comfyConfigured ? 'Proveedor conectado' : 'Falta conectar el proveedor'}</h3>
+              <p>{comfyConfigured ? 'LOW detecta la dirección del servidor y los workflows. La disponibilidad real se confirma al enviar una generación.' : 'Configura LOW_COMFYUI_URL, LOW_COMFYUI_IMAGE_WORKFLOW y LOW_COMFYUI_VIDEO_WORKFLOW en el entorno del backend. No expongas el servidor ComfyUI directamente a Internet sin autenticación y HTTPS.'}</p>
+              <small className="subtle">ComfyUI no cobra por llamada en su instalación propia. Necesitas un servidor compatible con GPU, workflows API y modelos descargados; los requisitos dependen del modelo.</small>
             </article>
             <div className="grid">
-              <article><Sparkles /><h3>Crear imagen</h3><p>Soul Standard · texto a imagen · 720p por defecto</p><button className="primary" onClick={() => { setMode('Imagen'); setPage('Chat'); }}>Abrir creador de imágenes <ArrowUp size={15} /></button></article>
-              <article><Activity /><h3>Crear vídeo</h3><p>Seedance 2.0 · texto a vídeo · clip de 5 segundos por defecto</p><button className="primary" onClick={() => { setMode('Video'); setPage('Chat'); }}>Abrir creador de vídeo <ArrowUp size={15} /></button></article>
+              <article><Sparkles /><h3>Crear imagen</h3><p>Workflow propio · texto a imagen</p><button className="primary" onClick={() => { setMode('Imagen'); setPage('Chat'); }}>Abrir creador de imágenes <ArrowUp size={15} /></button></article>
+              <article><Activity /><h3>Crear vídeo</h3><p>Workflow propio · texto a vídeo</p><button className="primary" onClick={() => { setMode('Video'); setPage('Chat'); }}>Abrir creador de vídeo <ArrowUp size={15} /></button></article>
             </div>
             <p className="subtle">No se ejecuta ninguna generación al abrir esta pantalla. Solo se cobra al enviar una solicitud al proveedor. Los resultados se consultan con un token temporal y expiran a las 24 horas en LOW.</p>
           </section>
