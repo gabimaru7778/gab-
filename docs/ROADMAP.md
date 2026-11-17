@@ -33,7 +33,8 @@
 
 ## Stage 5 — privacy and security
 - [ ] Threat-model authentication, session handling, vault encryption and API-key storage.
-- [ ] Add rate limits, input validation, CSRF/origin protections where applicable, and audit logging.
+- [x] Add input validation, per-route rate limits persisted in SQLite, and production Origin allowlist.
+- [ ] Complete CSRF review and add audit logging.
 - [ ] Keep security assessments passive or restricted to assets with explicit authorization.
 - [ ] Add data export and deletion workflows.
 
@@ -76,6 +77,7 @@ The frontend UI is present. CORE/WORK/SHIELD/CONNECT/VOICE are partial; MEMORY p
 - [x] Separate Creator submission and polling limits so polling is not blocked after a few checks.
 - [x] Store opaque job-token digests and enforce token ownership on media status requests; expire jobs after 24 hours.
 - [x] Add real Research and Higgsfield adapters with explicit missing-credential errors.
-- [ ] Add persistent rate limiting, audit events, account recovery, backups and production deployment.
+- [x] Persist rate-limit counters in SQLite across process restarts.
+- [ ] Add audit events, account recovery, backups and production deployment.
 - [ ] Generate and commit `package-lock.json`.
 - [ ] Build Android only after a production HTTPS API URL and cross-origin/mobile session strategy exist.
