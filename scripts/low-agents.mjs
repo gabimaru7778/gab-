@@ -49,7 +49,8 @@ function quality() {
   for (const f of anyTsIgnore) add("quality","low","typescript",`Directiva TypeScript que reduce comprobaciones: ${f}`);
 }
 function providers() {
-  const providerRefs = all.filter(x=>/higgsfield|hillfit|comfyui|stability|replicate/i.test(x.text));
+  const runtimeFiles = all.filter(x=>x.file.startsWith("server/") || x.file.startsWith("src/") || x.file === "package.json");
+  const providerRefs = runtimeFiles.filter(x=>/higgsfield|hillfit|comfyui|stability|replicate/i.test(x.text));
   const names = [...new Set(providerRefs.flatMap(x=>(x.text.match(/higgsfield|hillfit|comfyui|stability|replicate/ig)||[]).map(s=>s.toLowerCase())))];
   if (names.includes("higgsfield")) add("providers","info","creator","Se detectó integración Higgsfield. Es un proveedor externo; el auditor no intenta eludir autenticación, cuotas ni facturación.",providerRefs.map(x=>x.file).join(", "));
   if (names.includes("hillfit")) add("providers","medium","unknown-provider","Se detectó el término Hillfit; confirmar si es un error tipográfico, nombre de paquete o proveedor real.",providerRefs.map(x=>x.file).join(", "));
