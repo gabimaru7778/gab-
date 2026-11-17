@@ -36,3 +36,8 @@ LOW registra ECC como toolkit de ingeniería de agentes desde el repositorio ofi
 
 Repositorio canónico: https://github.com/affaan-m/ECC
 Paquete AgentShield: https://www.npmjs.com/package/ecc-agentshield
+
+
+## ORS4Net KeyHunter
+
+Se añadió un acceso informativo a https://github.com/n0rs4rt/Ors4Net-keyHunter. Por su capacidad de mostrar credenciales Wi-Fi guardadas en Windows, LOW no automatiza extracción, transferencia ni uso de contraseñas. La integración actual es solo un enlace al proyecto y documentación de uso responsable; cualquier análisis debe limitarse a equipos y perfiles propiedad del usuario o expresamente autorizados.
