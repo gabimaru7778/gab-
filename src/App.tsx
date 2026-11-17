@@ -239,7 +239,10 @@ export default function App() {
         if (r.data.jobId && r.data.accessToken) {
           for (let attempt = 0; attempt < 90; attempt++) {
             await new Promise(resolve => setTimeout(resolve, 2000));
-            const poll = await api.get('/api/guest/media/' + encodeURIComponent(r.data.jobId) + '?token=' + encodeURIComponent(r.data.accessToken));
+            const pollResponse = await fetch('/api/guest/media/' + encodeURIComponent(r.data.jobId), { credentials: 'include', headers: { 'x-low-job-token': r.data.accessToken } });
+            const pollData = await pollResponse.json().catch(() => ({}));
+            if (!pollResponse.ok) throw new Error(pollData.error || 'No se pudo consultar el trabajo multimedia.');
+            const poll = { data: pollData };
             mediaStatus = poll.data.status || 'processing';
             if (mediaStatus === 'completed') { mediaUrl = poll.data.mediaUrl || ''; break; }
             if (['failed', 'nsfw', 'canceled'].includes(mediaStatus)) throw new Error(poll.data.error || 'Higgsfield no pudo completar la generación.');
