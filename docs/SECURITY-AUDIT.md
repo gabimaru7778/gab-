@@ -26,7 +26,7 @@ Alcance: revisión estática del código, revisión de endpoints y pruebas de in
 4. Auditoría de eventos y observabilidad.
 5. Revisión de configuración del host, proxy inverso, persistencia de SQLite, HTTPS y límites de recursos.
 6. Dependencias sin lockfile comprometido; CI utiliza `npm install`, no `npm ci`.
-7. Prueba de los proveedores externos con credenciales reales: `LOW_AI_API_KEY`, `TAVILY_API_KEY`, `HF_API_KEY_ID` y `HF_API_KEY_SECRET`.
+7. Prueba de los proveedores configurados: `LOW_AI_API_KEY`, `TAVILY_API_KEY` y una instancia privada de ComfyUI con workflows API de imagen y vídeo.
 8. Pruebas de carga y revisión externa independiente antes de abrir el servicio a usuarios.
 
 ## Límites funcionales
