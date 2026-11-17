@@ -15,7 +15,7 @@ Son auditores estáticos deterministas, no agentes LLM con capacidad de modifica
 
 Las futuras capacidades de agentes que propongan parches deberán trabajar en ramas aisladas, ejecutar pruebas y requerir aprobación humana antes de fusionar o desplegar.
 
-## Sustitución de ComfyUI y costes de CREATOR
+## Sustitución de Higgsfield y costes de CREATOR
 
 El código actual documenta ComfyUI como proveedor de imagen/vídeo. No debe copiarse su API privada, eludirse autenticación ni falsearse el consumo para evitar pagos.
 
