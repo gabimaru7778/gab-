@@ -28,7 +28,7 @@ Vite: puerto 5173. API: puerto 3001. Compilar: `npm run build`.
 ## Estado real de módulos
 
 - CORE: chat base; requiere `LOW_AI_API_KEY` y endpoint/modelo compatibles.
-- MEMORY: bóveda cifrada en cliente, almacenada por usuario en SQLite; no hay sincronización multi-dispositivo ni recuperación de clave.
+- MEMORY: bóveda cifrada en cliente, almacenada por usuario en SQLite; se puede recuperar desde la misma instancia del backend al iniciar sesión en otro dispositivo; falta verificar despliegue persistente, backups y recuperación de clave.
 - WORK: agente textual; aún no ejecuta herramientas externas.
 - SHIELD: análisis defensivo del texto; no realiza escaneos ni conexiones a objetivos.
 - CONNECT: API key por usuario, endpoint Bearer `/v1/chat/completions`, listado de modelos y revocación de claves. Requiere configurar proveedor IA; sin CORS público para navegadores de terceros.
@@ -36,7 +36,7 @@ Vite: puerto 5173. API: puerto 3001. Compilar: `npm run build`.
 - VOICE: dictado iniciado por el usuario y lectura en voz alta mediante APIs del navegador; la disponibilidad depende de Safari/navegador y permisos del dispositivo. No hay escucha en segundo plano ni voz conversacional en streaming.
 - RESEARCH: adaptador de búsqueda web Tavily implementado; requiere `TAVILY_API_KEY` en el entorno del servidor. Sin esa clave, devuelve un error de configuración explícito.
 - DEVELOPER: laboratorio JavaScript en iframe sandbox con origen opaco, CSP sin red, sin Node ni acceso a archivos y límite de 2 segundos; no es un contenedor de servidor.
-- CLOUD: los registros cifrados se guardan en SQLite por cuenta, pero no hay sincronización de clientes/dispositivos ni backup automatizado.
+- CLOUD: los registros cifrados se guardan en SQLite por cuenta; el acceso entre dispositivos depende de usar la misma instancia persistente del backend. No hay backups automatizados ni despliegue persistente verificado.
 - LEARNING: la ruta de estado es un placeholder; no hay scheduler ni ciclos automáticos.
 - Android: no hay APK GitHub-native; requiere endpoint backend HTTPS desplegado y pipeline de compilación.
 
