@@ -1,0 +1,35 @@
+name: LOW autonomous audit agents
+on:
+  push:
+    branches: [main, low-github-native]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '30 9 * * *'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  agents:
+    name: "${{ matrix.agent }} agent"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        agent: [architecture, security, quality, providers]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run independent audit agent
+        run: node scripts/low-agents.mjs --agent ${{ matrix.agent }}
+      - name: Publish report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: low-agent-${{ matrix.agent }}
+          path: artifacts/low-agents/${{ matrix.agent }}.json
+          if-no-files-found: warn
+          retention-days: 14
