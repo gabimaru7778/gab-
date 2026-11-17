@@ -186,9 +186,8 @@ export default function App() {
       .finally(() => setReady(true));
   }, []);
   useEffect(() => {
-    const frame = developerFrameRef.current;
     const onSandboxMessage = (event: MessageEvent) => {
-      if (event.source !== frame?.contentWindow || !event.data || event.data.__lowSandbox !== true) return;
+      if (event.source !== developerFrameRef.current?.contentWindow || !event.data || event.data.__lowSandbox !== true) return;
       const text = String(event.data.text || '');
       if (event.data.type === 'done' || event.data.type === 'error') { window.clearTimeout(sandboxTimerRef.current); sandboxTimerRef.current = undefined; }
       if (event.data.type === 'log') setSandboxOutput(current => current === 'Ejecutando…' ? text : current + '\\n' + text);
