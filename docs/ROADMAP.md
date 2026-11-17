@@ -23,7 +23,7 @@
 - [ ] Implement configurable model adapters (GLM and other providers only when credentials and API compatibility are verified).
 - [ ] Add tool registry with schemas, permission scopes and audit events.
 - [ ] Add retrieval and citation checks for research.
-- [ ] Add safe code execution in isolated environments; never execute arbitrary code in the API process.
+- [x] Add a restricted browser-only JavaScript sandbox; server-side arbitrary code execution remains intentionally disabled.
 
 ## Stage 4 — controlled agents
 - [ ] Add planner, researcher, developer, tester, security reviewer and creator roles.
@@ -59,7 +59,8 @@ The recovered AppDeploy snapshot is version `1794036989678`. It contains a React
 - [x] Add real web-search adapter (Tavily; requires `TAVILY_API_KEY`).
 - [x] Add Higgsfield image/video job adapter (requires API key ID/secret and funded API balance).
 - [x] Add browser voice dictation and speech playback (browser-dependent).
-- [ ] Add isolated code execution, persistent cloud backups, scheduler-driven learning and Android app packaging.
+- [x] Add an isolated browser JavaScript sandbox with CSP network denial, opaque origin and a 2-second execution limit (not a server/container sandbox).
+- [ ] Add persistent cloud backups, scheduler-driven learning and Android app packaging.
 - [ ] Build Android wrapper against a GitHub-hosted API; do not use the former AppDeploy URL.
 - [ ] Create staging deployment from this repository and cut over only after acceptance tests.
 
