@@ -246,6 +246,7 @@ export default function App() {
     ['Módulos', BrainCircuit],
     ['Laboratorio', Code2],
     ['ComfyUI Studio', Sparkles],
+    ['Open Generative AI', Sparkles],
   ] as const;
   async function login() {
     setErr('');
@@ -932,6 +933,34 @@ export default function App() {
               <article><Activity /><h3>Crear vídeo</h3><p>Workflow propio · texto a vídeo</p><button className="primary" onClick={() => { setMode('Video'); setPage('Chat'); }}>Abrir creador de vídeo <ArrowUp size={15} /></button></article>
             </div>
             <p className="subtle">No se ejecuta ninguna generación al abrir esta pantalla. Solo se cobra al enviar una solicitud al proveedor. Los resultados se consultan con un token temporal y expiran a las 24 horas en LOW.</p>
+          </section>
+        )}
+        {page === 'Open Generative AI' && (
+          <section className="content">
+            <small>CREATOR / OPEN-SOURCE COMPANION</small>
+            <h1>Open Generative <em>AI.</em></h1>
+            <p>Conecta con el proyecto abierto Open Generative AI de GitHub: una suite independiente para crear y editar imágenes, vídeo, lip-sync y flujos creativos. LOW lo incorpora como acceso complementario; no copia ni ejecuta su aplicación dentro de este servidor.</p>
+            <div className="grid">
+              <article>
+                <Sparkles />
+                <small>REPOSITORIO</small>
+                <h3>Código abierto</h3>
+                <p>Revisa el código, licencia MIT, dependencias, modelos y pasos de instalación antes de desplegar tu propia instancia.</p>
+                <a href="https://github.com/Anil-matcha/Open-Generative-AI" target="_blank" rel="noreferrer">Abrir repositorio en GitHub ↗</a>
+              </article>
+              <article>
+                <Activity />
+                <small>VERSIÓN EN NAVEGADOR</small>
+                <h3>Probar el estudio</h3>
+                <p>La versión alojada es un servicio externo. Puede requerir cuenta, clave/API o créditos; sus condiciones y disponibilidad no dependen de LOW.</p>
+                <a href="https://muapi.ai/open-generative-ai" target="_blank" rel="noreferrer">Abrir Open Generative AI ↗</a>
+              </article>
+            </div>
+            <article className="learningCard">
+              <h3>Cómo se integra con LOW</h3>
+              <p>ComfyUI sigue siendo el motor multimedia conectado directamente a CREATOR. Open Generative AI queda como estudio complementario externo; no se envían automáticamente tus conversaciones, bóveda ni archivos de LOW a ese servicio.</p>
+              <small className="subtle">El repositorio es software abierto, pero no todos los modelos que ofrece ni sus APIs alojadas son necesariamente abiertos o gratuitos. El cómputo, los modelos y sus licencias tienen condiciones propias.</small>
+            </article>
           </section>
         )}
         <footer className="foot">
