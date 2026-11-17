@@ -35,7 +35,7 @@ Vite: puerto 5173. API: puerto 3001. Compilar: `npm run build`.
 - CREATOR: envío y consulta asíncrona de imágenes (Soul Standard) y vídeo (Seedance 2.0) con Higgsfield; requiere una sesión LOW autenticada, `HF_API_KEY_ID` y `HF_API_KEY_SECRET`, y una cuenta API con saldo. El modelo y la facturación API son independientes de la suscripción web.
 - VOICE: dictado iniciado por el usuario y lectura en voz alta mediante APIs del navegador; la disponibilidad depende de Safari/navegador y permisos del dispositivo. No hay escucha en segundo plano ni voz conversacional en streaming.
 - RESEARCH: adaptador de búsqueda web Tavily implementado; requiere `TAVILY_API_KEY` en el entorno del servidor. Sin esa clave, devuelve un error de configuración explícito.
-- DEVELOPER: ejecución aislada pendiente; no ejecuta código arbitrario.
+- DEVELOPER: laboratorio JavaScript en iframe sandbox con origen opaco, CSP sin red, sin Node ni acceso a archivos y límite de 2 segundos; no es un contenedor de servidor.
 - CLOUD: los registros cifrados se guardan en SQLite por cuenta, pero no hay sincronización de clientes/dispositivos ni backup automatizado.
 - LEARNING: la ruta de estado es un placeholder; no hay scheduler ni ciclos automáticos.
 - Android: no hay APK GitHub-native; requiere endpoint backend HTTPS desplegado y pipeline de compilación.
